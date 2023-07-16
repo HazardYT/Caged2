@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1bf4f84c2800d5418f7118eac178ef7, type: 3}
+  m_Name: Character_2
+  m_EditorClassIdentifier: 
+  id: 1
+  displayName: CHINK
+  icon: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  prefab: {fileID: 3800813666662993288, guid: 39f92b9ddb834b44a81dd5a5258f0c59, type: 3}
