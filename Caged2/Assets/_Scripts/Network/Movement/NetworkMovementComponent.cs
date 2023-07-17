@@ -121,9 +121,11 @@ public class NetworkMovementComponent : NetworkBehaviour
     }
 
 public void ProcessSimulatedPlayerMovement(){
-    if (IsHost){
-        _positionLerpSpeed = 1f;
-        _rotationLerpSpeed = 1f;
+    if (IsServer){
+        _positionLerpSpeed = 0.1f;
+        _rotationLerpSpeed = 0.1f;
+        print ("HOST CHANGING SPEED");
+
     }
     _tickDeltaTime += Time.deltaTime;
     if(_tickDeltaTime > _tickRate)
