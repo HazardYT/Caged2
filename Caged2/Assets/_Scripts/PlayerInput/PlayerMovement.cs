@@ -17,9 +17,10 @@ public class PlayerMovement : NetworkBehaviour
     {
         CinemachineVirtualCamera cvm = playerCam.gameObject.GetComponent<CinemachineVirtualCamera>();
         if (!IsOwner) { 
-        cvm.Priority = 0; 
-        playerCam.parent.GetComponentInChildren<AudioListener>().enabled = false; 
-        return; }
+            cvm.Priority = 0; 
+            playerCam.parent.GetComponentInChildren<AudioListener>().enabled = false; 
+            return; 
+        }
         cvm.Priority = 1;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
@@ -28,6 +29,7 @@ public class PlayerMovement : NetworkBehaviour
     }
     public void Update()
     {
+        if (!IsOwner) return;
         Vector2 lookInput = UserInput.instance.lookInput;
         Vector2 movementInput = UserInput.instance.moveInput;
         if (IsLocalPlayer && IsOwner){
