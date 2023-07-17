@@ -27,8 +27,8 @@ public class NetworkMovementComponent : NetworkBehaviour
     public TransformState _previousTransformState;
     private Vector3 _targetPosition;
     private Quaternion _targetRotation; 
-    private const float _positionLerpSpeed = 8f;
-    private const float _rotationLerpSpeed = 8f;
+    private const float _positionLerpSpeed = 25f;
+    private const float _rotationLerpSpeed = 25f;
 
     public const string IDLE = "Idle";
     public const string WALK_FORWARD = "Walk Forward";
