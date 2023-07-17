@@ -8,6 +8,8 @@ public class TransformState : INetworkSerializable
     public Vector3 Position;
     public Quaternion Rotation;
     public bool HasStartedMoving;
+    public bool isCrouching;
+    public bool isRunning;
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter{
         if (serializer.IsReader){
@@ -16,6 +18,8 @@ public class TransformState : INetworkSerializable
             reader.ReadValueSafe(out Position);
             reader.ReadValueSafe(out Rotation);
             reader.ReadValueSafe(out HasStartedMoving);
+            reader.ReadValueSafe(out isCrouching);
+            reader.ReadValueSafe(out isRunning);
         }
         else{
             var writer = serializer.GetFastBufferWriter();
@@ -23,6 +27,8 @@ public class TransformState : INetworkSerializable
             writer.WriteValueSafe(Position);
             writer.WriteValueSafe(Rotation);
             writer.WriteValueSafe(HasStartedMoving);
+            writer.WriteValueSafe(isCrouching);
+            writer.WriteValueSafe(isRunning);
         }
     }
 }

@@ -33,10 +33,12 @@ public class NetworkMovementComponent : NetworkBehaviour
     void Start(){
         _tickRate = 1f / ServerTickRate;
     }
+    private void OnEnable(){
+        ServerTransformState.OnValueChanged += OnServerStateChanged;
+    }
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-        ServerTransformState.OnValueChanged += OnServerStateChanged;
         _playerMovement = GetComponent<PlayerMovement>();
         _vcamTransform = _vcam.transform;
     }
