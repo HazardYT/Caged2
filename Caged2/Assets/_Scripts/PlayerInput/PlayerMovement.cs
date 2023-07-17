@@ -29,14 +29,14 @@ public class PlayerMovement : NetworkBehaviour
     }
     public void Update()
     {
-        if (!IsOwner) return;
         Vector2 lookInput = UserInput.instance.lookInput;
         Vector2 movementInput = UserInput.instance.moveInput;
-        if (IsLocalPlayer && IsOwner){
+        if (IsClient && IsLocalPlayer){
             _playerMovement.ProcessLocalPlayerMovement(movementInput, lookInput);
         }
         else{
             _playerMovement.ProcessSimulatedPlayerMovement();
+            print(NetworkManager.LocalClientId + " IS CALLING SIM PLAYER MOVEMENT");
         }
 
         //Look();
