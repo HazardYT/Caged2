@@ -27,8 +27,8 @@ public class NetworkMovementComponent : NetworkBehaviour
     public TransformState _previousTransformState;
     private Vector3 _targetPosition;
     private Quaternion _targetRotation; 
-    private float _positionLerpSpeed = 6f;
-    private float _rotationLerpSpeed = 6f;
+    private float _positionLerpSpeed = 0.1f;
+    private float _rotationLerpSpeed = 0.1f;
 
     public const string IDLE = "Idle";
     public const string WALK_FORWARD = "Walk Forward";
@@ -133,8 +133,8 @@ public void ProcessSimulatedPlayerMovement(){
         if(ServerTransformState.Value.HasStartedMoving){
 
             // Interpolate the position and rotation for smoother movement
-            transform.position = Vector3.Lerp(transform.position, ServerTransformState.Value.Position, _positionLerpSpeed * _tickDeltaTime);
-            transform.rotation = Quaternion.Lerp(transform.rotation, ServerTransformState.Value.Rotation, _rotationLerpSpeed * _tickDeltaTime);
+            transform.position = Vector3.Lerp(transform.position, ServerTransformState.Value.Position, _positionLerpSpeed);
+            transform.rotation = Quaternion.Lerp(transform.rotation, ServerTransformState.Value.Rotation, _rotationLerpSpeed);
         }
 
         _tickDeltaTime -= _tickRate;
