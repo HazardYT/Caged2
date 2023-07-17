@@ -27,8 +27,8 @@ public class NetworkMovementComponent : NetworkBehaviour
     public TransformState _previousTransformState;
     private Vector3 _targetPosition;
     private Quaternion _targetRotation; 
-    private const float _positionLerpSpeed = 6f;
-    private const float _rotationLerpSpeed = 6f;
+    private float _positionLerpSpeed = 6f;
+    private float _rotationLerpSpeed = 6f;
 
     public const string IDLE = "Idle";
     public const string WALK_FORWARD = "Walk Forward";
@@ -121,6 +121,10 @@ public class NetworkMovementComponent : NetworkBehaviour
     }
 
 public void ProcessSimulatedPlayerMovement(){
+    if (IsHost){
+        _positionLerpSpeed = 1f;
+        _rotationLerpSpeed = 1f;
+    }
     _tickDeltaTime += Time.deltaTime;
     if(_tickDeltaTime > _tickRate)
     {
