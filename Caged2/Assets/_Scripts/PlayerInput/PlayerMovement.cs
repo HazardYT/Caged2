@@ -30,7 +30,7 @@ public class PlayerMovement : NetworkBehaviour
     {
         Vector2 lookInput = UserInput.instance.lookInput;
         Vector2 movementInput = UserInput.instance.moveInput;
-        if (IsClient && IsLocalPlayer){
+        if (IsOwner){
             _playerMovement.ProcessLocalPlayerMovement(movementInput, lookInput);
         }
         else{
