@@ -50,6 +50,15 @@ public class NetworkMovementComponent : NetworkBehaviour
     }
     private void OnEnable(){
         ServerTransformState.OnValueChanged += OnValueChanged;
+        TransformState state = new TransformState(){
+        Tick = _tick,
+        Position = transform.position,
+        Rotation = transform.rotation,
+        HasStartedMoving = false
+        };
+
+        _previousTransformState = ServerTransformState.Value;
+        ServerTransformState.Value = state;
     }
     public override void OnNetworkSpawn()
     {
