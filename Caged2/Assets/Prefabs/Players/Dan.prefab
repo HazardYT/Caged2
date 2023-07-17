@@ -814,13 +814,13 @@ GameObject:
   m_Component:
   - component: {fileID: 279593053848219132}
   - component: {fileID: 4407496720683528207}
-  - component: {fileID: 2890572246814125049}
   - component: {fileID: 1925133852194156374}
   - component: {fileID: 3950133279695572710}
   - component: {fileID: 1468345669426958227}
   - component: {fileID: 2659889699546245831}
   - component: {fileID: 1007890603528503231}
   - component: {fileID: 7060918663378026427}
+  - component: {fileID: 7787832671704841413}
   m_Layer: 0
   m_Name: Dan
   m_TagString: Untagged
@@ -867,27 +867,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &2890572246814125049
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1042664207231814172}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 505fbd322e1601e4bb85f6099b0c057e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _cc: {fileID: 3950133279695572710}
-  _walkSpeed: 6
-  _runSpeed: 12
-  _sensitivity: 15
-  _camSocket: {fileID: 3736945588844558216}
-  _vcam: {fileID: 8263353015499011658}
-  _meshFilter: {fileID: 111374410085434379}
-  _color: {r: 1, g: 0.43214107, b: 0, a: 0.29803923}
-  _tickDeltaTime: 0
 --- !u!114 &1925133852194156374
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -900,10 +879,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4dce18372ae6ff5429ef2c61fb659e97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerMovement: {fileID: 2890572246814125049}
-  playerVCam: {fileID: 1877340958170974056}
+  _walkSpeed: 4
+  _runSpeed: 10
+  _mouseSensX: 15
+  _mouseSensY: 15
+  _controllerSensX: 25
+  _controllerSensY: 25
+  controller: {fileID: 3950133279695572710}
   anim: {fileID: 4407496720683528207}
-  cam: {fileID: 4938463692139139297}
+  playerCam: {fileID: 8263353015499011658}
   stamina: 100
   StaminaRegenMultiplier: 0
   StaminaDecreaseMultiplier: 0
@@ -1030,6 +1014,36 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TransitionStateInfoList: []
   m_Animator: {fileID: 4407496720683528207}
+--- !u!114 &7787832671704841413
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1042664207231814172}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b8072ff50726f54db065e9591e5eebe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 0
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 0
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  Interpolate: 1
+  SlerpPosition: 0
 --- !u!1 &1256797232012599095
 GameObject:
   m_ObjectHideFlags: 0
