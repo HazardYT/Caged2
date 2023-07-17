@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class InputState : MonoBehaviour
+public class InputState
 {
     public int Tick;
     public Vector2 movementInput;
