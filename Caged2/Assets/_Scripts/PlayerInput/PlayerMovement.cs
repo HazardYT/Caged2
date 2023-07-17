@@ -55,6 +55,7 @@ public class PlayerMovement : NetworkBehaviour
     }
     public void Update()
     {
+        if (!IsOwner) return;
         Vector2 lookInput = UserInput.instance.lookInput;
         Vector2 movementInput = UserInput.instance.moveInput;
         Look();
