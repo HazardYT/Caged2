@@ -1,5 +1,7 @@
-using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
+using UnityEngine;
 
 public class NetworkMovementComponent : NetworkBehaviour
 {
@@ -11,68 +13,91 @@ public class NetworkMovementComponent : NetworkBehaviour
 
     [SerializeField] private Transform _camSocket;
     [SerializeField] private Transform _vcam;
-    [SerializeField] private Animator anim;
+    [SerializeField] private MeshFilter _meshFilter;
+    [SerializeField] private Color _color;
     private Transform _vcamTransform;
-    private string CurrentAnimState;
-    private float _tickDeltaTime = 0;
+    public float _tickDeltaTime = 0;
     private int _tick = 0;
-    private float ServerTickRate = 60f;
+    private float ServerTickRate = 90f;
     private float _tickRate;
     private const int BUFFER_SIZE = 1024;
-
+    private PlayerMovement _playerMovement;
     private InputState[] _inputStates = new InputState[BUFFER_SIZE];
-
     private TransformState[] _transformStates = new TransformState[BUFFER_SIZE];
     public NetworkVariable<TransformState> ServerTransformState = new NetworkVariable<TransformState>();
     public TransformState _previousTransformState;
-    private Vector3 _targetPosition;
-    private Quaternion _targetRotation; 
-    private float _positionLerpSpeed = 25f;
-    private float _rotationLerpSpeed = 25f;
+    private float _positionLerpSpeed = 12f;
+    private float _rotationLerpSpeed = 12f;
 
-    public const string IDLE = "Idle";
-    public const string WALK_FORWARD = "Walk Forward";
-    public const string WALK_BACKWARD = "Walk Backward";
-    public const string WALK_LEFT = "Walk Left";
-    public const string WALK_RIGHT = "Walk Right";
-    public const string CROUCH_IDLE = "Crouch Idle";
-    public const string CROUCH_FORWARD = "Crouch Forward";
-    public const string CROUCH_BACKWARD = "Crouch Backward";
-    public const string CROUCH_LEFT = "Crouch Left";
-    public const string CROUCH_RIGHT = "Crouch Right";
-    public const string RUN_FORWARD = "Run Forward";
-    public const string RUN_BACKWARD = "Run Backward";
-    public const string RUN_LEFT = "Run Left";
-    public const string RUN_RIGHT = "Run Right";
-
+    private int _lastProcessedTick = -0;
     void Start(){
         _tickRate = 1f / ServerTickRate;
     }
-    private void OnEnable(){
-        ServerTransformState.OnValueChanged += OnValueChanged;
-    }
     public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
+        ServerTransformState.OnValueChanged += OnServerStateChanged;
+        _playerMovement = GetComponent<PlayerMovement>();
         _vcamTransform = _vcam.transform;
-        TransformState state = new TransformState(){
-        Tick = _tick,
-        Position = transform.position,
-        Rotation = transform.rotation,
-        HasStartedMoving = false
-        };
-
-        _previousTransformState = ServerTransformState.Value;
-        ServerTransformState.Value = state;
     }
-    private void OnValueChanged(TransformState previousValue, TransformState newValue)
+    private void OnServerStateChanged(TransformState previousValue, TransformState serverState)
     {
-        _previousTransformState = previousValue;
-        _targetPosition = newValue.Position;
-        _targetRotation = newValue.Rotation;
+        if (!IsLocalPlayer) return;
+
+        if (_previousTransformState == null)
+        {
+            _previousTransformState = serverState;
+        }
+
+        TransformState calculatedState = _transformStates.First(localState => localState.Tick == serverState.Tick);
+        if (calculatedState.Position != serverState.Position)
+        {
+            Debug.Log("Correcting Client Position");
+            TeleportPlayer(serverState);
+
+            IEnumerable<InputState> inputs = _inputStates.Where(input => input.Tick > serverState.Tick);
+
+            inputs = from input in inputs orderby input.Tick select input;
+
+            foreach(InputState inputState in inputs)
+            {
+                MovePlayer(inputState.movementInput, inputState.crouchInput, inputState.sprintInput);
+                RotatePlayer(inputState.lookInput);
+
+                TransformState newTransformState = new TransformState(){
+                    Tick = inputState.Tick,
+                    Position = transform.position,
+                    Rotation = transform.rotation,
+                    HasStartedMoving = true,
+                };
+
+                for (int i = 0; i < _transformStates.Length; i++)
+                {
+                    if (_transformStates[i].Tick == inputState.Tick){
+                        _transformStates[i] = newTransformState;
+                        break;
+                    }
+                }
+            }
+        }
     }
-    public void ProcessLocalPlayerMovement(Vector2 movementInput, Vector2 lookInput){
-        bool isCrouched = UserInput.instance.CrouchHeld && !UserInput.instance.SprintHeld;
-        bool isRunning = UserInput.instance.SprintHeld && !UserInput.instance.CrouchHeld;
+    private void TeleportPlayer(TransformState state)
+    {
+        _cc.enabled = false;
+        transform.position = state.Position;
+        transform.rotation = state.Rotation;
+        _cc.enabled = true;
+
+        for (int i = 0; i < _transformStates.Length; i++)
+        {
+            if (_transformStates[i].Tick == state.Tick)
+            {
+                _transformStates[i] = state;
+                break;
+            }
+        }
+    }
+    public void ProcessLocalPlayerMovement(Vector2 movementInput, Vector2 lookInput, bool isCrouched = false, bool isRunning = false){
         _tickDeltaTime += Time.deltaTime;
         if (_tickDeltaTime > _tickRate)
         {
@@ -92,7 +117,9 @@ public class NetworkMovementComponent : NetworkBehaviour
                     Tick = _tick,
                     Position = transform.position,
                     Rotation = transform.rotation,
-                    HasStartedMoving = true
+                    HasStartedMoving = true,
+                    isCrouching = isCrouched,
+                    isRunning = isRunning
                 };
 
                 _previousTransformState = ServerTransformState.Value;
@@ -103,13 +130,17 @@ public class NetworkMovementComponent : NetworkBehaviour
                 Tick = _tick,
                 movementInput = movementInput,
                 lookInput = lookInput,
+                crouchInput = isCrouched,
+                sprintInput = isRunning
             };
 
             TransformState transformState = new TransformState(){
                 Tick = _tick,
                 Position = transform.position,
                 Rotation = transform.rotation,
-                HasStartedMoving = true
+                HasStartedMoving = true,
+                isCrouching = isCrouched,
+                isRunning = isRunning
             };
 
             _inputStates[bufferIndex] = inputState;
@@ -127,8 +158,8 @@ public void ProcessSimulatedPlayerMovement(){
         if(ServerTransformState.Value.HasStartedMoving){
 
             // Interpolate the position and rotation for smoother movement
-            transform.position = Vector3.Lerp(transform.position, ServerTransformState.Value.Position, _positionLerpSpeed * Time.deltaTime);
-            transform.rotation = Quaternion.Lerp(transform.rotation, ServerTransformState.Value.Rotation, _rotationLerpSpeed * Time.deltaTime);
+            transform.position = Vector3.Lerp(transform.position, ServerTransformState.Value.Position, _positionLerpSpeed * _tickDeltaTime);
+            transform.rotation = Quaternion.Lerp(transform.rotation, ServerTransformState.Value.Rotation, _rotationLerpSpeed * _tickDeltaTime);
         }
 
         _tickDeltaTime -= _tickRate;
@@ -136,9 +167,9 @@ public void ProcessSimulatedPlayerMovement(){
     }
 }
 
-    private void MovePlayer(Vector2 movementInput, bool isCrouched, bool isRunning)
+    private void MovePlayer(Vector2 movementInput, bool isCrouched = false, bool isRunning = false)
     {
-        HandleAnimationParams(movementInput, isCrouched, isRunning);
+        _playerMovement.HandleAnimationParams(movementInput, isCrouched, isRunning);
         Vector3 movement = movementInput.x * transform.right + movementInput.y * transform.forward;
 
             movement.y = 0;
@@ -179,6 +210,13 @@ public void ProcessSimulatedPlayerMovement(){
     }
     [ServerRpc]
     private void MovePlayerServerRpc(int tick, Vector2 movementInput, Vector2 lookInput, bool isCrouched, bool isRunning){
+
+        if (_lastProcessedTick + 1 != tick)
+        {
+            Debug.Log("I missed a tick");
+            Debug.Log($"Received Tick {tick}");
+        }
+        _lastProcessedTick = tick;
         MovePlayer(movementInput, isCrouched, isRunning);
         RotatePlayer(lookInput);
 
@@ -187,116 +225,19 @@ public void ProcessSimulatedPlayerMovement(){
             Tick = tick,
             Position = transform.position,
             Rotation = transform.rotation,
-            HasStartedMoving = true
+            HasStartedMoving = true,
+            isCrouching = isCrouched,
+            isRunning = isRunning
         };
         _previousTransformState = ServerTransformState.Value;
         ServerTransformState.Value = state;
     }
-    public void HandleAnimationParams(Vector2 movement, bool isCrouched, bool isRunning)
-    {
-        if (!isCrouched){
-            if (movement.y > 0)
-            {
-                if (movement.x > 0) // IF walking forward and right or left overtake the forward
-                {
-                    if (isRunning) ChangeAnimationState(RUN_RIGHT);
-                    else ChangeAnimationState(WALK_RIGHT); // walk right
-                }
-                else if (movement.x < 0)
-                {
-                    if (isRunning) ChangeAnimationState(RUN_LEFT);
-                    else ChangeAnimationState(WALK_LEFT); // walk left
-                }
-                else
-                {
-                    if (isRunning) ChangeAnimationState(RUN_FORWARD);
-                    else ChangeAnimationState(WALK_FORWARD); // walk forward
-                }
-            }
-            else if (movement.y < 0) // IF walking backward and right or left overtake the backward
-            {
-                if (movement.x > 0)
-                {
-                    if (isRunning) ChangeAnimationState(RUN_RIGHT);
-                    else ChangeAnimationState(WALK_RIGHT); // walk right
-                }
-                else if (movement.x < 0)
-                {
-                    if (isRunning) ChangeAnimationState(RUN_LEFT);
-                    else ChangeAnimationState(WALK_LEFT); // walk left
-                }
-                else
-                {
-                    if (isRunning) ChangeAnimationState(RUN_BACKWARD);
-                    else ChangeAnimationState(WALK_BACKWARD); // walk back
-                }
-            }
-            else if (movement.x > 0) // walk right
-            {
-                if (isRunning) ChangeAnimationState(RUN_RIGHT);
-                else ChangeAnimationState(WALK_RIGHT);
-            }
-            else if (movement.x < 0) // walk left
-            {
-                if (isRunning) ChangeAnimationState(RUN_LEFT);
-                else ChangeAnimationState(WALK_LEFT);
-            }
-            else // idle
-            {
-                ChangeAnimationState(IDLE);
-            }
-        }
-        else{
-            if (movement.y > 0)
-            {
-                if (movement.x > 0) // IF walking forward and right or left overtake the forward
-                {
-                    ChangeAnimationState(CROUCH_RIGHT); // walk right
-                }
-                else if (movement.x < 0)
-                {
-                    ChangeAnimationState(CROUCH_LEFT); // walk left
-                }
-                else
-                {
-                    ChangeAnimationState(CROUCH_FORWARD); // walk forward
-                }
-            }
-            else if (movement.y < 0) // IF walking backward and right or left overtake the backward
-            {
-                if (movement.x > 0)
-                {
-                    ChangeAnimationState(CROUCH_RIGHT); // walk right
-                }
-                else if (movement.x < 0)
-                {
-                    ChangeAnimationState(CROUCH_LEFT); // walk left
-                }
-                else
-                {
-                    ChangeAnimationState(CROUCH_BACKWARD); // walk back
-                }
-            }
-            else if (movement.x > 0) // walk right
-            {
-                ChangeAnimationState(CROUCH_RIGHT);
-            }
-            else if (movement.x < 0) // walk left
-            {
-                ChangeAnimationState(CROUCH_LEFT);
-            }
-            else // idle
-            {
-                ChangeAnimationState(CROUCH_IDLE);
-            }            
+
+    private void OnDrawGizmos(){
+        if (ServerTransformState.Value != null){
+            Gizmos.color = _color;
+            Gizmos.DrawMesh(_meshFilter.mesh, ServerTransformState.Value.Position);
         }
     }
-    private void ChangeAnimationState(string state){
-        if (CurrentAnimState == state) {return;}
-        // make sure the state isnt the same
-        anim.CrossFadeInFixedTime(state, 10 * _tickDeltaTime);
-        // play animation with a blend time
-        CurrentAnimState = state;
-        // set the incoming state to currentstate
-    }
+
 }
