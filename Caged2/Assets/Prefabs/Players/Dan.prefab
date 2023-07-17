@@ -811,7 +811,7 @@ GameObject:
   - component: {fileID: 1468345669426958227}
   - component: {fileID: 2659889699546245831}
   - component: {fileID: 1007890603528503231}
-  - component: {fileID: 6746140173034826080}
+  - component: {fileID: 2978920293481935955}
   m_Layer: 0
   m_Name: Dan
   m_TagString: Untagged
@@ -1003,7 +1003,7 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &6746140173034826080
+--- !u!114 &2978920293481935955
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1012,7 +1012,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1042664207231814172}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 468dae173106ec944abad6bba968b52a, type: 3}
+  m_Script: {fileID: 11500000, guid: e8d0727d5ae3244e3b569694d3912374, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   TransitionStateInfoList: []
