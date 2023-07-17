@@ -50,6 +50,10 @@ public class NetworkMovementComponent : NetworkBehaviour
     }
     private void OnEnable(){
         ServerTransformState.OnValueChanged += OnValueChanged;
+    }
+    public override void OnNetworkSpawn()
+    {
+        _vcamTransform = _vcam.transform;
         TransformState state = new TransformState(){
         Tick = _tick,
         Position = transform.position,
@@ -59,10 +63,6 @@ public class NetworkMovementComponent : NetworkBehaviour
 
         _previousTransformState = ServerTransformState.Value;
         ServerTransformState.Value = state;
-    }
-    public override void OnNetworkSpawn()
-    {
-        _vcamTransform = _vcam.transform;   
     }
     private void OnValueChanged(TransformState previousValue, TransformState newValue)
     {
