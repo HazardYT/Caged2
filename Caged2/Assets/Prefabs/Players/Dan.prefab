@@ -890,7 +890,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerMovement: {fileID: 2890572246814125049}
-  playerCam: {fileID: 8263353015499011658}
+  playerVCam: {fileID: 1877340958170974056}
+  cam: {fileID: 4938463692139139297}
   stamina: 100
   StaminaRegenMultiplier: 0
   StaminaDecreaseMultiplier: 0

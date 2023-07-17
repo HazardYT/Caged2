@@ -6,7 +6,8 @@ public class PlayerMovement : NetworkBehaviour
     [Header("Variables")]
     [SerializeField] private NetworkMovementComponent _playerMovement;
     private CapsuleCollider capsuleCollider;
-    public Transform playerCam;
+    public CinemachineVirtualCamera playerVCam;
+    public Camera cam;
     public float stamina = 100f;
     private float StaminaRegenTimer = 0.0f;
     private const float StaminaTimeToRegen = 0.5f;
@@ -15,13 +16,12 @@ public class PlayerMovement : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        CinemachineVirtualCamera cvm = playerCam.gameObject.GetComponent<CinemachineVirtualCamera>();
         if (!IsOwner) { 
-            cvm.Priority = 0; 
-            playerCam.parent.GetComponentInChildren<AudioListener>().enabled = false; 
+            playerVCam.Priority = 0; 
+            cam.GetComponent<AudioListener>().enabled = false; 
             return; 
         }
-        cvm.Priority = 1;
+        playerVCam.Priority = 1;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         capsuleCollider = GetComponent<CapsuleCollider>();
@@ -33,10 +33,11 @@ public class PlayerMovement : NetworkBehaviour
         Vector2 movementInput = UserInput.instance.moveInput;
         if (IsClient && IsLocalPlayer){
             _playerMovement.ProcessLocalPlayerMovement(movementInput, lookInput);
+            print (NetworkManager.LocalClientId + "IS CALLING LOCAL MOVEMENT LLLLLLLLLLL");
         }
         else{
             _playerMovement.ProcessSimulatedPlayerMovement();
-            print(NetworkManager.LocalClientId + " IS CALLING SIM PLAYER MOVEMENT");
+            print(NetworkManager.LocalClientId + " IS CALLING SIM PLAYER MOVEMENT SSSSSSSS");
         }
 
         //Look();
