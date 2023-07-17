@@ -121,20 +121,14 @@ public class NetworkMovementComponent : NetworkBehaviour
     }
 
 public void ProcessSimulatedPlayerMovement(){
-    if (IsServer){
-        _positionLerpSpeed = 0.1f;
-        _rotationLerpSpeed = 0.1f;
-        print ("HOST CHANGING SPEED");
-
-    }
     _tickDeltaTime += Time.deltaTime;
     if(_tickDeltaTime > _tickRate)
     {
         if(ServerTransformState.Value.HasStartedMoving){
 
             // Interpolate the position and rotation for smoother movement
-            transform.position = Vector3.Lerp(transform.position, ServerTransformState.Value.Position, _positionLerpSpeed);
-            transform.rotation = Quaternion.Lerp(transform.rotation, ServerTransformState.Value.Rotation, _rotationLerpSpeed);
+            transform.position = Vector3.Lerp(transform.position, ServerTransformState.Value.Position, _positionLerpSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.Lerp(transform.rotation, ServerTransformState.Value.Rotation, _rotationLerpSpeed * Time.deltaTime);
         }
 
         _tickDeltaTime -= _tickRate;
