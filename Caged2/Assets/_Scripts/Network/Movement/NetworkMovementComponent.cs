@@ -294,7 +294,7 @@ public void ProcessSimulatedPlayerMovement(){
     private void ChangeAnimationState(string state){
         if (CurrentAnimState == state) {return;}
         // make sure the state isnt the same
-        anim.CrossFadeInFixedTime(state, 0.3f);
+        anim.CrossFadeInFixedTime(state, 10 * _tickDeltaTime);
         // play animation with a blend time
         CurrentAnimState = state;
         // set the incoming state to currentstate
