@@ -13,9 +13,11 @@ public class NetworkMovementComponent : NetworkBehaviour
 
     [SerializeField] private Transform _camSocket;
     [SerializeField] private Transform _vcam;
+
     [SerializeField] private MeshFilter _meshFilter;
     [SerializeField] private Color _color;
     private Transform _vcamTransform;
+
     public float _tickDeltaTime = 0;
     private int _tick = 0;
     private float ServerTickRate = 90f;
@@ -55,6 +57,7 @@ public class NetworkMovementComponent : NetworkBehaviour
         if (calculatedState.Position != serverState.Position)
         {
             Debug.Log("Correcting Client Position");
+            
             TeleportPlayer(serverState);
 
             IEnumerable<InputState> inputs = _inputStates.Where(input => input.Tick > serverState.Tick);
@@ -71,6 +74,8 @@ public class NetworkMovementComponent : NetworkBehaviour
                     Position = transform.position,
                     Rotation = transform.rotation,
                     HasStartedMoving = true,
+                    isCrouching = inputState.crouchInput,
+                    isRunning = inputState.sprintInput
                 };
 
                 for (int i = 0; i < _transformStates.Length; i++)
@@ -109,6 +114,7 @@ public class NetworkMovementComponent : NetworkBehaviour
                 MovePlayerServerRpc(_tick, movementInput, lookInput, isCrouched, isRunning);
                 MovePlayer(movementInput, isCrouched, isRunning);
                 RotatePlayer(lookInput);
+                SaveState(movementInput, lookInput, isCrouched, isRunning, bufferIndex);
             }
             else
             {
@@ -124,51 +130,57 @@ public class NetworkMovementComponent : NetworkBehaviour
                     isRunning = isRunning
                 };
 
+                SaveState(movementInput, lookInput, isCrouched, isRunning, bufferIndex);
+                
                 _previousTransformState = ServerTransformState.Value;
                 ServerTransformState.Value = state;
             }
-
-            InputState inputState = new InputState(){
-                Tick = _tick,
-                movementInput = movementInput,
-                lookInput = lookInput,
-                crouchInput = isCrouched,
-                sprintInput = isRunning
-            };
-
-            TransformState transformState = new TransformState(){
-                Tick = _tick,
-                Position = transform.position,
-                Rotation = transform.rotation,
-                HasStartedMoving = true,
-                isCrouching = isCrouched,
-                isRunning = isRunning
-            };
-
-            _inputStates[bufferIndex] = inputState;
-            _transformStates[bufferIndex] = transformState;
 
             _tickDeltaTime -= _tickRate;
             _tick++;
         }
     }
 
-public void ProcessSimulatedPlayerMovement(){
-    _tickDeltaTime += Time.deltaTime;
-    if(_tickDeltaTime > _tickRate)
-    {
-        if(ServerTransformState.Value.HasStartedMoving){
+    public void ProcessSimulatedPlayerMovement(){
+        _tickDeltaTime += Time.deltaTime;
+        if(_tickDeltaTime > _tickRate)
+        {
+            if(ServerTransformState.Value.HasStartedMoving){
 
-            // Interpolate the position and rotation for smoother movement
-            transform.position = Vector3.Lerp(transform.position, ServerTransformState.Value.Position, _positionLerpSpeed * _tickDeltaTime);
-            transform.rotation = Quaternion.Lerp(transform.rotation, ServerTransformState.Value.Rotation, _rotationLerpSpeed * _tickDeltaTime);
+                // Interpolate the position and rotation for smoother movement
+                transform.position = Vector3.Lerp(transform.position, ServerTransformState.Value.Position, _positionLerpSpeed * _tickDeltaTime);
+                transform.rotation = Quaternion.Lerp(transform.rotation, ServerTransformState.Value.Rotation, _rotationLerpSpeed * _tickDeltaTime);
+            }
+
+            _tickDeltaTime -= _tickRate;
+            _tick++;
         }
-
-        _tickDeltaTime -= _tickRate;
-        _tick++;
     }
-}
+        private void SaveState(Vector2 movementInput, Vector2 lookInput, bool crouchInput, bool runningInput, int bufferIndex)
+        {
+            InputState inputState = new InputState()
+            {
+                Tick = _tick,
+                movementInput = movementInput,
+                lookInput = lookInput,
+                crouchInput = crouchInput,
+                sprintInput = runningInput
+                
+            };
 
+            TransformState transformState = new TransformState()
+            {
+                Tick = _tick,
+                Position = transform.position,
+                Rotation = transform.rotation,
+                HasStartedMoving = true,
+                isCrouching = crouchInput,
+                isRunning = runningInput
+            };
+
+            _inputStates[bufferIndex] = inputState;
+            _transformStates[bufferIndex] = transformState;
+        }
     private void MovePlayer(Vector2 movementInput, bool isCrouched = false, bool isRunning = false)
     {
         _playerMovement.HandleAnimationParams(movementInput, isCrouched, isRunning);
