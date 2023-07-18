@@ -11,7 +11,7 @@ public class CharacterSelectDisplay : NetworkBehaviour
     [SerializeField] private PlayerCard[] playerCards;
     [SerializeField] private GameObject characterInfoPanel;
     [SerializeField] private TMP_Text characterNameText;
-
+    private FixedString32Bytes localPlayerName;
 
     private NetworkList<CharacterSelectState> players;
 
@@ -19,6 +19,7 @@ public class CharacterSelectDisplay : NetworkBehaviour
     private void Awake()
     {
         players = new NetworkList<CharacterSelectState>();
+        localPlayerName = Steamworks.SteamClient.Name;
     }
     public override void OnNetworkSpawn()
     {
@@ -47,8 +48,7 @@ public class CharacterSelectDisplay : NetworkBehaviour
        }
     }
     private void HandleClientConnected(ulong clientId){
-        FixedString32Bytes name = Steamworks.SteamClient.Name;
-        players.Add(new CharacterSelectState(clientId, name));
+        players.Add(new CharacterSelectState(clientId, localPlayerName));
     }
     private void HandleClientDisconnected(ulong clientId){
         for (int i = 0; i < players.Count; i++)
@@ -76,7 +76,7 @@ public class CharacterSelectDisplay : NetworkBehaviour
             {
                 players[i] = new CharacterSelectState(
                     players[i].ClientId,
-                    Steamworks.SteamClient.Name,
+                    players[i].name,
                     characterId
                 );
                 ServerManager.Instance.SetCharacter(players[i].ClientId, characterId);
