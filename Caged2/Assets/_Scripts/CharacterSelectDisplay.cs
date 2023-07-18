@@ -19,9 +19,6 @@ public class CharacterSelectDisplay : NetworkBehaviour
     private void Awake()
     {
         players = new NetworkList<CharacterSelectState>();
-        if (IsClient){
-        localPlayerName = Steamworks.SteamClient.Name;
-        }
     }
     public override void OnNetworkSpawn()
     {
@@ -33,6 +30,7 @@ public class CharacterSelectDisplay : NetworkBehaviour
                 selectButtonInstance.SetCharacter(this, character);
             }
             players.OnListChanged += HandlePlayersStateChanged;
+            localPlayerName = SteamManager.steamName;
         }
         if (IsServer){
             NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;

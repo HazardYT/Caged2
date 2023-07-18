@@ -1,7 +1,7 @@
 using UnityEngine;
 using Steamworks;
 using Steamworks.Data;
-using UnityEngine.SceneManagement;
+using Unity.Collections;
 using Netcode.Transports.Facepunch;
 using Unity.Netcode;
 using UnityEngine.UI;
@@ -9,7 +9,7 @@ using TMPro;
 
 public class SteamManager : NetworkBehaviour
 {
-
+    public static FixedString32Bytes steamName;
     [SerializeField] private TMP_InputField LobbyIDInput;
     [SerializeField] private TMP_Text LobbyID;
     [SerializeField] private GameObject MainMenu;
@@ -39,6 +39,7 @@ public class SteamManager : NetworkBehaviour
         if (NetworkManager.Singleton.IsHost) return;
         NetworkManager.Singleton.gameObject.GetComponent<FacepunchTransport>().targetSteamId = lobby.Owner.Id;
         NetworkManager.Singleton.StartClient();
+        steamName = Steamworks.SteamClient.Name;
         if (!IsHost) { startButton.SetActive(false); mapButton.interactable = false; }
     }
     private void LobbyCreated(Result result, Lobby lobby)
