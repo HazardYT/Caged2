@@ -19,7 +19,9 @@ public class CharacterSelectDisplay : NetworkBehaviour
     private void Awake()
     {
         players = new NetworkList<CharacterSelectState>();
+        if (IsClient){
         localPlayerName = Steamworks.SteamClient.Name;
+        }
     }
     public override void OnNetworkSpawn()
     {
