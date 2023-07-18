@@ -1,6 +1,8 @@
 using Unity.Netcode;
 using UnityEngine;
 using TMPro;
+using Unity.Collections;
+
 public class CharacterSelectDisplay : NetworkBehaviour
 {
     [SerializeField] private CharacterDatabase characterDatabase;
@@ -45,7 +47,8 @@ public class CharacterSelectDisplay : NetworkBehaviour
        }
     }
     private void HandleClientConnected(ulong clientId){
-        players.Add(new CharacterSelectState(clientId));
+        FixedString32Bytes name = Steamworks.SteamClient.Name;
+        players.Add(new CharacterSelectState(clientId, name));
     }
     private void HandleClientDisconnected(ulong clientId){
         for (int i = 0; i < players.Count; i++)
@@ -73,6 +76,7 @@ public class CharacterSelectDisplay : NetworkBehaviour
             {
                 players[i] = new CharacterSelectState(
                     players[i].ClientId,
+                    Steamworks.SteamClient.Name,
                     characterId
                 );
                 ServerManager.Instance.SetCharacter(players[i].ClientId, characterId);

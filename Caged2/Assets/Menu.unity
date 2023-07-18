@@ -159,7 +159,6 @@ MonoBehaviour:
   InLobbyMenu: {fileID: 1832806822}
   startButton: {fileID: 1805681031}
   mapButton: {fileID: 314785048}
-  currentMapSelected: WickedWoods
 --- !u!4 &11326912
 Transform:
   m_ObjectHideFlags: 0
@@ -3155,8 +3154,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -2.897522, y: -0.00012207031}
-  m_SizeDelta: {x: 310.088, y: 170.19}
+  m_AnchoredPosition: {x: 0.00015258789, y: -0.000045776367}
+  m_SizeDelta: {x: 353.58, y: 198.93}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1621762776
 MonoBehaviour:
@@ -3171,15 +3170,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.4056604, g: 0.4056604, b: 0.4056604, a: 1}
+  m_Color: {r: 0.6509434, g: 0.6509434, b: 0.6509434, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 71f29bd8280ed464085d356c6c95590f, type: 3}
-  m_Type: 0
+  m_Sprite: {fileID: 10911, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -4124,7 +4123,7 @@ PrefabInstance:
     - target: {fileID: 677235592939457293, guid: 3756ee70d9d5591479b05fa55e013977,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -41.7
+      value: -41.69995
       objectReference: {fileID: 0}
     - target: {fileID: 932866161479017865, guid: 3756ee70d9d5591479b05fa55e013977,
         type: 3}
@@ -4324,7 +4323,7 @@ PrefabInstance:
     - target: {fileID: 4940060329919212053, guid: 3756ee70d9d5591479b05fa55e013977,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 6.3026
+      value: 6.3026123
       objectReference: {fileID: 0}
     - target: {fileID: 5250995004305912843, guid: 3756ee70d9d5591479b05fa55e013977,
         type: 3}

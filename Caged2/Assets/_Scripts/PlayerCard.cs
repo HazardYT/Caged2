@@ -21,7 +21,7 @@ public class PlayerCard : MonoBehaviour
         else{
             characterIconImage.enabled = false;
         }
-        playerNameText.text = Steamworks.SteamClient.Name;
+        playerNameText.text = state.SteamName.ToString();
         visuals.SetActive(true);
     }
     public void DisableDisplay(){
