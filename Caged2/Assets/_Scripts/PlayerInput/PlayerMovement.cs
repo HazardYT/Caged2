@@ -24,7 +24,7 @@ public class PlayerMovement : NetworkBehaviour
     float xRotation;
     float verticalVelocity = 0;
     private float gravity = 9.61f;
-
+    [SerializeField] private GameObject item;
     public const string IDLE = "Idle";
     public const string WALK_FORWARD = "Walk Forward";
     public const string WALK_BACKWARD = "Walk Backward";
@@ -60,6 +60,10 @@ public class PlayerMovement : NetworkBehaviour
         Vector2 movementInput = UserInput.instance.moveInput;
         Look();
         Move();
+        if (UserInput.instance.Slot3Pressed){
+            GameObject i = Instantiate(item, Vector3.zero, Quaternion.identity);
+            i.GetComponent<NetworkObject>().Spawn();
+        }
     }
     public void Look()
     {
@@ -67,7 +71,7 @@ public class PlayerMovement : NetworkBehaviour
 
         if (mouseLook == Vector2.zero) { return; }
 
-        bool usingMouse = UserInput.instance.currentLookInput is Mouse;
+        bool usingMouse = UserInput.instance.currentInputDevice == ControlScheme.KeyboardMouse;
         float sensX = usingMouse ? _mouseSensX : _controllerSensX;
         float sensY = usingMouse ? _mouseSensY : _controllerSensY;
 
