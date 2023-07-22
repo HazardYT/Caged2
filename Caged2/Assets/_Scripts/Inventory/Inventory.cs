@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.Animations;
 
@@ -114,6 +115,8 @@ public class Inventory : NetworkBehaviour
         ParentConstraint constraint = networkObject.GetComponent<ParentConstraint>();
         constraint.AddSource(constraintSource);
         constraint.constraintActive = true;
+        networkObject.GetComponent<OwnerNetworkTransform>().enabled = false;
+        networkObject.GetComponent<NetworkRigidbody>().enabled = false;
         SelectHandServerRpc(slot);
     }
 
@@ -140,7 +143,8 @@ public class Inventory : NetworkBehaviour
         Inventory inv = NetworkManager.ConnectedClients[rpcParams.Receive.SenderClientId].PlayerObject.GetComponent<Inventory>();
         if (inv._selectedHandItem != null)
         {
-            if (!inv._handItems[inv._selectedSlot].GetComponent<NetworkObject>().TryRemoveParent(true))
+            NetworkObject networkObject = inv._handItems[inv._selectedSlot].GetComponent<NetworkObject>();
+            if (!networkObject.TryRemoveParent(true))
             {
                 Debug.LogError("Failed to Drop item Because: TryRemoveParent Failed.");
                 return;
@@ -155,7 +159,10 @@ public class Inventory : NetworkBehaviour
             constraint.constraintActive = false;
             inv._selectedHandItem = null;
             inv._handItems[inv._selectedSlot] = null;
-            pickUpObjectRigidbody.AddForce(transform.forward * 2, ForceMode.Impulse);
+            networkObject.GetComponent<OwnerNetworkTransform>().enabled = true;
+            networkObject.GetComponent<NetworkRigidbody>().enabled = true;
+            networkObject.transform.position = cam.transform.position;
+            pickUpObjectRigidbody.AddForce(cam.transform.forward * 4, ForceMode.Impulse);
             for (byte i = 0; i < _handItems.Length; i++)
             {
                 if (_handItems[i] != null)
