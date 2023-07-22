@@ -115,7 +115,6 @@ public class Inventory : NetworkBehaviour
         ParentConstraint constraint = networkObject.GetComponent<ParentConstraint>();
         constraint.AddSource(constraintSource);
         constraint.constraintActive = true;
-        networkObject.GetComponent<OwnerNetworkTransform>().enabled = false;
         networkObject.GetComponent<NetworkRigidbody>().enabled = false;
         SelectHandServerRpc(slot);
     }
@@ -159,7 +158,6 @@ public class Inventory : NetworkBehaviour
             constraint.constraintActive = false;
             inv._selectedHandItem = null;
             inv._handItems[inv._selectedSlot] = null;
-            networkObject.GetComponent<OwnerNetworkTransform>().enabled = true;
             networkObject.GetComponent<NetworkRigidbody>().enabled = true;
             networkObject.transform.position = cam.transform.position;
             pickUpObjectRigidbody.AddForce(cam.transform.forward * 4, ForceMode.Impulse);
