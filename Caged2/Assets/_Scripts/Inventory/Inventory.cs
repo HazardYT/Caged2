@@ -87,7 +87,7 @@ public class Inventory : NetworkBehaviour
     }
 
     // Server RPC to pick up an item and place it in the player's hand
-    [ServerRpc(RequireOwnership = false)]
+    [ServerRpc]
     public void PickupItemServerRpc(byte slot, NetworkObjectReference networkObjectReference, ServerRpcParams rpcParams = default)
     {
         Inventory inv = NetworkManager.ConnectedClients[rpcParams.Receive.SenderClientId].PlayerObject.GetComponent<Inventory>();
@@ -115,12 +115,28 @@ public class Inventory : NetworkBehaviour
         ParentConstraint constraint = networkObject.GetComponent<ParentConstraint>();
         constraint.AddSource(constraintSource);
         constraint.constraintActive = true;
-        networkObject.GetComponent<NetworkRigidbody>().enabled = false;
+        PickupClientRpc(networkObjectReference, rpcParams.Receive.SenderClientId, slot);
         SelectHandServerRpc(slot);
     }
-
+    [ClientRpc]
+    public void PickupClientRpc(NetworkObjectReference reference, ulong id, byte slot){
+        NetworkObject playerNetworkObject = NetworkManager.SpawnManager.GetPlayerNetworkObject(id);
+        if (!reference.TryGet(out NetworkObject networkObject)){
+            Debug.LogError("Cant get Client NetworkObject From Reference");
+        }
+        Inventory inv = playerNetworkObject.GetComponent<Inventory>();
+        ConstraintSource constraintSource = new ConstraintSource
+        {
+            sourceTransform = inv._handSlots[slot],
+            weight = 1
+        };
+        ParentConstraint constraint = networkObject.GetComponent<ParentConstraint>();
+        constraint.AddSource(constraintSource);
+        constraint.constraintActive = true;
+        
+    }
     // Server RPC to select the item in the player's hand
-    [ServerRpc(RequireOwnership = false)]
+    [ServerRpc]
     public void SelectHandServerRpc(byte value, ServerRpcParams rpcParams = default)
     {
         Inventory inv = NetworkManager.ConnectedClients[rpcParams.Receive.SenderClientId].PlayerObject.GetComponent<Inventory>();
@@ -136,7 +152,7 @@ public class Inventory : NetworkBehaviour
     }
 
     // Server RPC to drop the selected item from the player's hand
-    [ServerRpc(RequireOwnership = false)]
+    [ServerRpc]
     public void DropSelectedItemServerRpc(ServerRpcParams rpcParams = default)
     {
         Inventory inv = NetworkManager.ConnectedClients[rpcParams.Receive.SenderClientId].PlayerObject.GetComponent<Inventory>();
@@ -158,7 +174,6 @@ public class Inventory : NetworkBehaviour
             constraint.constraintActive = false;
             inv._selectedHandItem = null;
             inv._handItems[inv._selectedSlot] = null;
-            networkObject.GetComponent<NetworkRigidbody>().enabled = true;
             networkObject.transform.position = cam.transform.position;
             pickUpObjectRigidbody.AddForce(cam.transform.forward * 4, ForceMode.Impulse);
             for (byte i = 0; i < _handItems.Length; i++)
