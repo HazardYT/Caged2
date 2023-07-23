@@ -87,21 +87,14 @@ public class Inventory : NetworkBehaviour
         }
     }
 
-    // pick up an item and place it in the player's hand
     public void PickupItem(byte slot, NetworkObjectReference networkObjectReference)
     {
+        TryParentServerRpc(networkObjectReference);
         if (!networkObjectReference.TryGet(out NetworkObject networkObject))
         {
             Debug.LogError("Failed to Pickup item Because: TryGet from NetworkObjectReference Failed.");
             return;
         }
-
-        if (!networkObject.TrySetParent(transform, false))
-        {
-            Debug.LogError("Failed to Pickup item Because: TrySetParent Failed.");
-            return;
-        }
-
         _handItems[slot] = networkObject.transform;
         var pickUpObjectRigidbody = networkObject.GetComponent<Rigidbody>();
         pickUpObjectRigidbody.isKinematic = true;
@@ -116,7 +109,6 @@ public class Inventory : NetworkBehaviour
         constraint.constraintActive = true;
         SelectHand(slot);
     }
-    // Server RPC to select the item in the player's hand
     public void SelectHand(byte value)
     {
         if (_selectedHandItem != null)
@@ -130,18 +122,12 @@ public class Inventory : NetworkBehaviour
         _selectedHandItem.localScale *= 1.25f;
     }
 
-    // Server RPC to drop the selected item from the player's hand
     public void DropSelectedItem()
     {
         if (_selectedHandItem != null)
         {
             NetworkObject networkObject = _handItems[_selectedSlot].GetComponent<NetworkObject>();
-            if (!networkObject.TryRemoveParent(true))
-            {
-                Debug.LogError("Failed to Drop item Because: TryRemoveParent Failed.");
-                return;
-            }
-
+            TryRemoveParentServerRpc(new NetworkObjectReference(networkObject));
             _selectedHandItem.localScale /= 1.25f;
             var pickUpObjectRigidbody = _handItems[_selectedSlot].GetComponent<Rigidbody>();
             pickUpObjectRigidbody.isKinematic = false;
@@ -164,6 +150,39 @@ public class Inventory : NetworkBehaviour
         else
         {
             Debug.LogError("You have no Selected items to drop!");
+        }
+    }
+    [ServerRpc]
+    public void TryParentServerRpc(NetworkObjectReference networkObjectReference, ServerRpcParams rpcParams = default){
+
+        Transform transform = NetworkManager.ConnectedClients[rpcParams.Receive.SenderClientId].PlayerObject.transform;
+
+        if (!networkObjectReference.TryGet(out NetworkObject networkObject))
+        {
+            Debug.LogError("Failed to Get Item NetworkObject: TryGet from NetworkObjectReference Failed.");
+            return;
+        }
+
+        if (!networkObject.TrySetParent(transform, false))
+        {
+            Debug.LogError("Failed to Parent Item: TrySetParent Failed.");
+            return;
+        }
+    }
+    [ServerRpc]
+    public void TryRemoveParentServerRpc(NetworkObjectReference networkObjectReference, ServerRpcParams rpcParams = default){
+
+        Transform transform = NetworkManager.ConnectedClients[rpcParams.Receive.SenderClientId].PlayerObject.transform;
+
+        if (!networkObjectReference.TryGet(out NetworkObject networkObject))
+        {
+            Debug.LogError("Failed to Get Item NetworkObject: TryGet from NetworkObjectReference Failed.");
+            return;
+        }
+        if (!networkObject.TryRemoveParent(true))
+        {
+            Debug.LogError("Failed to Drop item Because: TryRemoveParent Failed.");
+            return;
         }
     }
 }
