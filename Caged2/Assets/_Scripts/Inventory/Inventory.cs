@@ -79,6 +79,7 @@ public class Inventory : NetworkBehaviour
                         PickupItem(i, reference);
                         return;
                     }
+                    else Debug.LogError("Failed To Get Component [NetworkObject] from Item");
                 }
 
                 Debug.LogError("Your Hands are Full!");
@@ -87,7 +88,7 @@ public class Inventory : NetworkBehaviour
     }
 
     // pick up an item and place it in the player's hand
-    public void PickupItem(byte slot, NetworkObjectReference networkObjectReference, ServerRpcParams rpcParams = default)
+    public void PickupItem(byte slot, NetworkObjectReference networkObjectReference)
     {
         if (!networkObjectReference.TryGet(out NetworkObject networkObject))
         {
@@ -116,7 +117,7 @@ public class Inventory : NetworkBehaviour
         SelectHand(slot);
     }
     // Server RPC to select the item in the player's hand
-    public void SelectHand(byte value, ServerRpcParams rpcParams = default)
+    public void SelectHand(byte value)
     {
         if (_selectedHandItem != null)
         {
@@ -130,7 +131,7 @@ public class Inventory : NetworkBehaviour
     }
 
     // Server RPC to drop the selected item from the player's hand
-    public void DropSelectedItem(ServerRpcParams rpcParams = default)
+    public void DropSelectedItem()
     {
         if (_selectedHandItem != null)
         {
