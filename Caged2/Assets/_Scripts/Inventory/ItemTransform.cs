@@ -12,7 +12,7 @@ using Unity.Netcode;
             if (transform.parent == null) OnItemDropped();
             else OnItemGrabbed(equipSlot.Value);
         }
-        public void SetEquipSlotServerRpc(ulong id, byte slot){
+        public void SetEquipSlot(ulong id, byte slot){
             equipSlot.Value = slot;
         }
         public void OnItemGrabbed(byte i){
