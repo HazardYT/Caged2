@@ -8,7 +8,8 @@ using Unity.Netcode;
         private OwnerNetworkTransform ownerNetworkTransform;
         public void OnTransformParentChanged()
         { 
-            _handTransform = transform.root.GetChild(0).GetChild(0);
+            if (transform.parent == null) OnItemDropped();
+            else OnItemGrabbed();
             /*Inventory inventory = parentNetworkObject.GetComponent<Inventory>();
             for (int i = 0; i < inventory._handItems.Length; i++)
             {
@@ -18,6 +19,10 @@ using Unity.Netcode;
                 }
             }
             */
+        } 
+        public void OnItemGrabbed(){
+            _handTransform = transform.root.GetChild(0).GetChild(0);
+            ownerNetworkTransform.enabled = false;
         }
         public void OnItemDropped(){
             _handTransform = null;
