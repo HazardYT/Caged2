@@ -17,7 +17,7 @@ public class ItemTransform : NetworkBehaviour
             OnItemGrabbed(equipSlot.Value);
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void SetEquipSlotServerRpc(ulong id, byte slot)
     {
         ItemTransform itemTransform = NetworkManager.SpawnManager.SpawnedObjects[id].transform.GetComponent<ItemTransform>();
