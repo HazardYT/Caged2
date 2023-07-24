@@ -12,8 +12,10 @@ using Unity.Netcode;
             if (transform.parent == null) OnItemDropped();
             else OnItemGrabbed(equipSlot.Value);
         }
-        public void SetEquipSlot(ulong id, byte slot){
-            equipSlot.Value = slot;
+        [ServerRpc]
+        public void SetEquipSlotServerRpc(ulong id, byte slot){
+            ItemTransform itemTransform = NetworkManager.SpawnManager.SpawnedObjects[id].GetComponent<ItemTransform>();
+            itemTransform.equipSlot.Value = slot;
         }
         public void OnItemGrabbed(byte i){
             _handTransform = transform.root.GetChild(0).GetChild(i);
