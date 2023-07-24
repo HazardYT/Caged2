@@ -12,7 +12,7 @@ using Unity.Netcode;
             if (transform.parent == null) OnItemDropped();
             else OnItemGrabbed(equipSlot.Value);
         }
-        [ServerRpc]
+        [ServerRpc(RequireOwnership = false)]
         public void SetEquipSlotServerRpc(ulong id, byte slot){
             ItemTransform itemTransform = NetworkManager.SpawnManager.SpawnedObjects[id].GetComponent<ItemTransform>();
             itemTransform.equipSlot.Value = slot;
