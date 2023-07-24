@@ -1,30 +1,25 @@
-using System;
 using UnityEngine;
-
-    public class ItemTransform : MonoBehaviour
+using Unity.Netcode;
+    public class ItemTransform : NetworkBehaviour
     {
         [SerializeField]
         private Transform _handTransform;
         [SerializeField]
         private OwnerNetworkTransform ownerNetworkTransform;
-        public void OnTransformParentChanged(){
-            Invoke(nameof(FindTransformLocation),0.1f);
-        }
-
-    private void FindTransformLocation()
-    {
-        Inventory inventory = transform.root.GetComponent<Inventory>();
-        for (int i = 0; i < inventory._handItems.Length; i++)
-        {
-            if (inventory._handItems[i] == this.transform){
-                _handTransform = inventory._handSlots[i];
-                return;
+        public void OnTransformParentChanged()
+        { 
+            _handTransform = transform.root.GetChild(0).GetChild(0);
+            /*Inventory inventory = parentNetworkObject.GetComponent<Inventory>();
+            for (int i = 0; i < inventory._handItems.Length; i++)
+            {
+                if (inventory._handItems[i] == this.transform){
+                    _handTransform = inventory._handSlots[i];
+                    return;
+                }
             }
-                
+            */
         }
-    }
-
-    public void OnItemDropped(){
+        public void OnItemDropped(){
             _handTransform = null;
             ownerNetworkTransform.enabled = true;
         }
