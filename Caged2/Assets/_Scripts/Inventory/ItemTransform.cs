@@ -18,12 +18,10 @@ public class ItemTransform : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
-    public void SetEquipSlotServerRpc(byte slot)
+    public void SetEquipSlotServerRpc(ulong id, byte slot)
     {
-        // Check for valid values of 'slot' here if needed
-
-        // Just update the equipSlot directly on the server
-        equipSlot.Value = slot;
+        ItemTransform itemTransform = NetworkManager.SpawnManager.SpawnedObjects[id].transform.GetComponent<ItemTransform>();
+        itemTransform.equipSlot.Value = slot;
     }
 
     public void OnItemGrabbed(byte i)

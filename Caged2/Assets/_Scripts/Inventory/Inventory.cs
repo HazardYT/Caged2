@@ -76,7 +76,7 @@ public class Inventory : NetworkBehaviour
                     {
                         NetworkObjectReference reference = new NetworkObjectReference(networkObject);
                         PickupItemServerRpc(i, reference);
-                        networkObject.GetComponent<ItemTransform>().SetEquipSlotServerRpc(i);
+                        networkObject.GetComponent<ItemTransform>().SetEquipSlotServerRpc(networkObject.NetworkObjectId, i);
                         return;
                     }
                     else Debug.LogError("Failed To Get Component [NetworkObject] from Item");
