@@ -1,16 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Netcode;
-using Unity.Netcode.Components;
 using UnityEngine;
-using UnityEngine.Animations;
 
 public class Inventory : NetworkBehaviour
 {
     public Camera cam;
     public LayerMask layerMask;
     public Transform[] _handSlots;
-    [SerializeField] private Transform[] _handItems;
+    public Transform[] _handItems;
     [SerializeField] private Transform _selectedHandItem;
     [SerializeField] private InventoryVisuals visuals;
     [SerializeField] private byte _selectedSlot;
@@ -121,7 +117,6 @@ public class Inventory : NetworkBehaviour
         var pickUpObjectRigidbody = networkObject.GetComponent<Rigidbody>();
         pickUpObjectRigidbody.isKinematic = true;
         pickUpObjectRigidbody.interpolation = RigidbodyInterpolation.None;
-        networkObject.GetComponent<ItemTransform>().OnItemPickup(slot);
         SelectHand(slot);
     }
 

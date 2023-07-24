@@ -6,9 +6,14 @@ using UnityEngine;
         private Transform _handTransform;
         [SerializeField]
         private OwnerNetworkTransform ownerNetworkTransform;
-        public void OnItemPickup(byte i){
-            _handTransform = transform.root.GetComponent<Inventory>()._handSlots[i];
-            ownerNetworkTransform.enabled = false;
+        public void OnTransformParentChanged(){
+            Inventory inventory = transform.root.GetComponent<Inventory>();
+            if (inventory._handItems[0] != null){
+                _handTransform = transform.root.GetComponent<Inventory>()._handSlots[0];
+            }
+            else if (inventory._handItems[1] != null){
+                _handTransform = transform.root.GetComponent<Inventory>()._handSlots[1];
+            }
         }
         public void OnItemDropped(){
             _handTransform = null;
