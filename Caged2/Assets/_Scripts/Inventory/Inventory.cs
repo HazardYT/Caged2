@@ -75,6 +75,7 @@ public class Inventory : NetworkBehaviour
                     if (hit.transform.TryGetComponent<NetworkObject>(out NetworkObject networkObject))
                     {
                         NetworkObjectReference reference = new NetworkObjectReference(networkObject);
+                        networkObject.GetComponent<ItemTransform>().SetEquipSlotServerRpc(networkObject.NetworkObjectId, i);
                         PickupItemServerRpc(i, reference);
                         return;
                     }
@@ -107,8 +108,6 @@ public class Inventory : NetworkBehaviour
             Debug.LogError("Failed to Get Item NetworkObject: TryGet from NetworkObjectReference Failed.");
             return;
         }
-        networkObject.ChangeOwnership(rpcParams.Receive.SenderClientId);
-        networkObject.GetComponent<ItemTransform>().SetEquipSlotServerRpc(networkObject.NetworkObjectId, slot);
         _handItems[slot] = networkObject.transform;
         var pickUpObjectRigidbody = networkObject.GetComponent<Rigidbody>();
         pickUpObjectRigidbody.isKinematic = true;
