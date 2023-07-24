@@ -9,7 +9,7 @@ public class Inventory : NetworkBehaviour
     public Transform[] _handItems;
     [SerializeField] private Transform _selectedHandItem;
     [SerializeField] private InventoryVisuals visuals;
-    [SerializeField] private byte _selectedSlot;
+    public NetworkVariable<byte> _selectedSlot = new NetworkVariable<byte>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     private void Update()
     {
@@ -94,7 +94,7 @@ public class Inventory : NetworkBehaviour
         }
 
         _selectedHandItem = _handItems[value];
-        _selectedSlot = value;
+        _selectedSlot.Value = value;
         _selectedHandItem.localScale *= 1.25f;
     }
     [ServerRpc]
@@ -107,35 +107,35 @@ public class Inventory : NetworkBehaviour
             Debug.LogError("Failed to Get Item NetworkObject: TryGet from NetworkObjectReference Failed.");
             return;
         }
-
+        networkObject.GetComponent<ItemTransform>().SetEquipSlotServerRpc(networkObject.NetworkObjectId, slot);
+        _handItems[slot] = networkObject.transform;
+        var pickUpObjectRigidbody = networkObject.GetComponent<Rigidbody>();
+        pickUpObjectRigidbody.isKinematic = true;
+        pickUpObjectRigidbody.interpolation = RigidbodyInterpolation.None;
         if (!networkObject.TrySetParent(transform, false))
         {
             Debug.LogError("Failed to Parent Item: TrySetParent Failed.");
             return;
         }
-        _handItems[slot] = networkObject.transform;
-        var pickUpObjectRigidbody = networkObject.GetComponent<Rigidbody>();
-        pickUpObjectRigidbody.isKinematic = true;
-        pickUpObjectRigidbody.interpolation = RigidbodyInterpolation.None;
         SelectHand(slot);
     }
 
     [ServerRpc]
     public void DropSelectedItemServerRpc(ServerRpcParams rpcParams = default)
     {
-        NetworkObject networkObject = _handItems[_selectedSlot].GetComponent<NetworkObject>();
+        NetworkObject networkObject = _handItems[_selectedSlot.Value].GetComponent<NetworkObject>();
         if (!networkObject.TryRemoveParent(true))
         {
             Debug.LogError("Failed to Drop item Because: TryRemoveParent Failed.");
             return;
         }
         _selectedHandItem.localScale /= 1.25f;
-        var pickUpObjectRigidbody = _handItems[_selectedSlot].GetComponent<Rigidbody>();
+        var pickUpObjectRigidbody = _handItems[_selectedSlot.Value].GetComponent<Rigidbody>();
         pickUpObjectRigidbody.isKinematic = false;
         pickUpObjectRigidbody.interpolation = RigidbodyInterpolation.Interpolate;
         networkObject.GetComponent<ItemTransform>().OnItemDropped();
         _selectedHandItem = null;
-        _handItems[_selectedSlot] = null;
+        _handItems[_selectedSlot.Value] = null;
         networkObject.transform.position = cam.transform.position;
         pickUpObjectRigidbody.AddForce(cam.transform.forward * 4, ForceMode.Impulse);
         for (byte i = 0; i < _handItems.Length; i++)
@@ -145,5 +145,10 @@ public class Inventory : NetworkBehaviour
                 SelectHand(i);
             }
         }
+    }
+    [ServerRpc]
+    public void SetSelectedSlotServerRpc(byte slot, ServerRpcParams rpcParams = default){
+        Inventory inventory = NetworkManager.ConnectedClients[rpcParams.Receive.SenderClientId].PlayerObject.GetComponent<Inventory>();
+        inventory._selectedSlot.Value = slot;
     }
 }

@@ -6,22 +6,19 @@ using Unity.Netcode;
         private Transform _handTransform;
         [SerializeField]
         private OwnerNetworkTransform ownerNetworkTransform;
+        public NetworkVariable<byte> equipSlot = new NetworkVariable<byte>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public void OnTransformParentChanged()
         { 
             if (transform.parent == null) OnItemDropped();
-            else OnItemGrabbed();
-            /*Inventory inventory = parentNetworkObject.GetComponent<Inventory>();
-            for (int i = 0; i < inventory._handItems.Length; i++)
-            {
-                if (inventory._handItems[i] == this.transform){
-                    _handTransform = inventory._handSlots[i];
-                    return;
-                }
-            }
-            */
-        } 
-        public void OnItemGrabbed(){
-            _handTransform = transform.root.GetChild(0).GetChild(0);
+            else OnItemGrabbed(equipSlot.Value);
+        }
+        [ServerRpc(RequireOwnership = false)]
+        public void SetEquipSlotServerRpc(ulong id, byte slot, ServerRpcParams rpcParams = default){
+            ItemTransform itemTransform = NetworkManager.SpawnManager.SpawnedObjects[id].GetComponent<ItemTransform>();
+            itemTransform.equipSlot.Value = slot;
+        }
+        public void OnItemGrabbed(byte i){
+            _handTransform = transform.root.GetChild(0).GetChild(i);
             ownerNetworkTransform.enabled = false;
         }
         public void OnItemDropped(){
