@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
     public class ItemTransform : MonoBehaviour
@@ -7,15 +8,23 @@ using UnityEngine;
         [SerializeField]
         private OwnerNetworkTransform ownerNetworkTransform;
         public void OnTransformParentChanged(){
-            Inventory inventory = transform.root.GetComponent<Inventory>();
-            if (inventory._handItems[0] != null){
-                _handTransform = transform.root.GetComponent<Inventory>()._handSlots[0];
-            }
-            else if (inventory._handItems[1] != null){
-                _handTransform = transform.root.GetComponent<Inventory>()._handSlots[1];
-            }
+            Invoke(nameof(FindTransformLocation),0.1f);
         }
-        public void OnItemDropped(){
+
+    private void FindTransformLocation()
+    {
+        Inventory inventory = transform.root.GetComponent<Inventory>();
+        for (int i = 0; i < inventory._handItems.Length; i++)
+        {
+            if (inventory._handItems[i] == this.transform){
+                _handTransform = inventory._handSlots[i];
+                return;
+            }
+                
+        }
+    }
+
+    public void OnItemDropped(){
             _handTransform = null;
             ownerNetworkTransform.enabled = true;
         }
