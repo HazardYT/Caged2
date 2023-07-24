@@ -75,6 +75,7 @@ public class Inventory : NetworkBehaviour
                     if (hit.transform.TryGetComponent<NetworkObject>(out NetworkObject networkObject))
                     {
                         NetworkObjectReference reference = new NetworkObjectReference(networkObject);
+                        networkObject.ChangeOwnership(OwnerClientId);
                         PickupItemServerRpc(i, reference);
                         networkObject.GetComponent<ItemTransform>().SetEquipSlotServerRpc(networkObject.NetworkObjectId, i);
                         return;
