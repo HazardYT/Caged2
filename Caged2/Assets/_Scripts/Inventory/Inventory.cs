@@ -9,10 +9,10 @@ public class Inventory : NetworkBehaviour
 {
     public Camera cam;
     public LayerMask layerMask;
-    [SerializeField] private InventoryVisuals visuals;
+    public Transform[] _handSlots;
     [SerializeField] private Transform[] _handItems;
-    [SerializeField] private Transform[] _handSlots;
     [SerializeField] private Transform _selectedHandItem;
+    [SerializeField] private InventoryVisuals visuals;
     [SerializeField] private byte _selectedSlot;
 
     private void Update()
@@ -47,7 +47,10 @@ public class Inventory : NetworkBehaviour
 
         if (UserInput.instance.ThrowReleased)
         {
-            DropSelectedItem();
+            if (_selectedHandItem != null)
+                DropSelectedItemServerRpc();
+            else 
+                Debug.LogError("You have no Selected items to drop!");
         }
 
         // Controller Specific Input
@@ -76,7 +79,7 @@ public class Inventory : NetworkBehaviour
                     if (hit.transform.TryGetComponent<NetworkObject>(out NetworkObject networkObject))
                     {
                         NetworkObjectReference reference = new NetworkObjectReference(networkObject);
-                        PickupItem(i, reference);
+                        PickupItemServerRpc(i, reference);
                         return;
                     }
                     else Debug.LogError("Failed To Get Component [NetworkObject] from Item");
@@ -85,29 +88,6 @@ public class Inventory : NetworkBehaviour
                 Debug.LogError("Your Hands are Full!");
             }
         }
-    }
-
-    public void PickupItem(byte slot, NetworkObjectReference networkObjectReference)
-    {
-        TryParentServerRpc(networkObjectReference);
-        if (!networkObjectReference.TryGet(out NetworkObject networkObject))
-        {
-            Debug.LogError("Failed to Pickup item Because: TryGet from NetworkObjectReference Failed.");
-            return;
-        }
-        _handItems[slot] = networkObject.transform;
-        var pickUpObjectRigidbody = networkObject.GetComponent<Rigidbody>();
-        pickUpObjectRigidbody.isKinematic = true;
-        pickUpObjectRigidbody.interpolation = RigidbodyInterpolation.None;
-        ConstraintSource constraintSource = new ConstraintSource
-        {
-            sourceTransform = _handSlots[slot],
-            weight = 1
-        };
-        ParentConstraint constraint = networkObject.GetComponent<ParentConstraint>();
-        constraint.AddSource(constraintSource);
-        constraint.constraintActive = true;
-        SelectHand(slot);
     }
     public void SelectHand(byte value)
     {
@@ -121,40 +101,9 @@ public class Inventory : NetworkBehaviour
         _selectedSlot = value;
         _selectedHandItem.localScale *= 1.25f;
     }
-
-    public void DropSelectedItem()
-    {
-        if (_selectedHandItem != null)
-        {
-            NetworkObject networkObject = _handItems[_selectedSlot].GetComponent<NetworkObject>();
-            TryRemoveParentServerRpc(new NetworkObjectReference(networkObject));
-            _selectedHandItem.localScale /= 1.25f;
-            var pickUpObjectRigidbody = _handItems[_selectedSlot].GetComponent<Rigidbody>();
-            pickUpObjectRigidbody.isKinematic = false;
-            pickUpObjectRigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-            ParentConstraint constraint = _handItems[_selectedSlot].GetComponent<ParentConstraint>();
-            constraint.RemoveSource(0);
-            constraint.constraintActive = false;
-            _selectedHandItem = null;
-            _handItems[_selectedSlot] = null;
-            networkObject.transform.position = cam.transform.position;
-            pickUpObjectRigidbody.AddForce(cam.transform.forward * 4, ForceMode.Impulse);
-            for (byte i = 0; i < _handItems.Length; i++)
-            {
-                if (_handItems[i] != null)
-                {
-                    SelectHand(i);
-                }
-            }
-        }
-        else
-        {
-            Debug.LogError("You have no Selected items to drop!");
-        }
-    }
     [ServerRpc]
-    public void TryParentServerRpc(NetworkObjectReference networkObjectReference, ServerRpcParams rpcParams = default){
-
+    public void PickupItemServerRpc(byte slot, NetworkObjectReference networkObjectReference, ServerRpcParams rpcParams = default)
+    {
         Transform transform = NetworkManager.ConnectedClients[rpcParams.Receive.SenderClientId].PlayerObject.transform;
 
         if (!networkObjectReference.TryGet(out NetworkObject networkObject))
@@ -168,21 +117,38 @@ public class Inventory : NetworkBehaviour
             Debug.LogError("Failed to Parent Item: TrySetParent Failed.");
             return;
         }
+        _handItems[slot] = networkObject.transform;
+        var pickUpObjectRigidbody = networkObject.GetComponent<Rigidbody>();
+        pickUpObjectRigidbody.isKinematic = true;
+        pickUpObjectRigidbody.interpolation = RigidbodyInterpolation.None;
+        networkObject.GetComponent<ItemTransform>().OnItemPickup(slot);
+        SelectHand(slot);
     }
+
     [ServerRpc]
-    public void TryRemoveParentServerRpc(NetworkObjectReference networkObjectReference, ServerRpcParams rpcParams = default){
-
-        Transform transform = NetworkManager.ConnectedClients[rpcParams.Receive.SenderClientId].PlayerObject.transform;
-
-        if (!networkObjectReference.TryGet(out NetworkObject networkObject))
-        {
-            Debug.LogError("Failed to Get Item NetworkObject: TryGet from NetworkObjectReference Failed.");
-            return;
-        }
+    public void DropSelectedItemServerRpc(ServerRpcParams rpcParams = default)
+    {
+        NetworkObject networkObject = _handItems[_selectedSlot].GetComponent<NetworkObject>();
         if (!networkObject.TryRemoveParent(true))
         {
             Debug.LogError("Failed to Drop item Because: TryRemoveParent Failed.");
             return;
+        }
+        _selectedHandItem.localScale /= 1.25f;
+        var pickUpObjectRigidbody = _handItems[_selectedSlot].GetComponent<Rigidbody>();
+        pickUpObjectRigidbody.isKinematic = false;
+        pickUpObjectRigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+        networkObject.GetComponent<ItemTransform>().OnItemDropped();
+        _selectedHandItem = null;
+        _handItems[_selectedSlot] = null;
+        networkObject.transform.position = cam.transform.position;
+        pickUpObjectRigidbody.AddForce(cam.transform.forward * 4, ForceMode.Impulse);
+        for (byte i = 0; i < _handItems.Length; i++)
+        {
+            if (_handItems[i] != null)
+            {
+                SelectHand(i);
+            }
         }
     }
 }

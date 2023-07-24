@@ -865,14 +865,14 @@ MonoBehaviour:
   layerMask:
     serializedVersion: 2
     m_Bits: 64
-  visuals: {fileID: 5532980212006723302}
-  _handItems:
-  - {fileID: 0}
-  - {fileID: 0}
   _handSlots:
   - {fileID: 8423469555459342454}
   - {fileID: 4166467289943371816}
+  _handItems:
+  - {fileID: 0}
+  - {fileID: 0}
   _selectedHandItem: {fileID: 0}
+  visuals: {fileID: 5532980212006723302}
   _selectedSlot: 0
 --- !u!114 &1925133852194156374
 MonoBehaviour:
@@ -1955,9 +1955,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3297479449575597455}
-  m_LocalRotation: {x: 0.00000018725348, y: 0.000000093626824, z: -0.00000037450704,
+  m_LocalRotation: {x: 0.00000018725336, y: 0.00000018725365, z: -0.0000007490141,
     w: 1}
-  m_LocalPosition: {x: 0.395, y: -0.522, z: 0.00000047683716}
+  m_LocalPosition: {x: 0.34099984, y: -0.517, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1974,12 +1974,12 @@ ParentConstraint:
   m_Enabled: 1
   serializedVersion: 2
   m_Weight: 1
-  m_TranslationAtRest: {x: 0.395, y: -0.522, z: 0}
-  m_RotationAtRest: {x: 0, y: 0, z: 0}
+  m_TranslationAtRest: {x: 0.34099984, y: -0.517, z: 0}
+  m_RotationAtRest: {x: 0, y: 0, z: -0.00008583064}
   m_TranslationOffsets:
-  - {x: 0.036011696, y: 0.0047985315, z: -0.06356406}
+  - {x: 0.014052391, y: 0.039138556, z: -0.027793169}
   m_RotationOffsets:
-  - {x: 19.9182, y: -104.30181, z: -132.37222}
+  - {x: 19.918207, y: -104.30181, z: -132.37227}
   m_AffectTranslationX: 1
   m_AffectTranslationY: 1
   m_AffectTranslationZ: 1
@@ -3420,7 +3420,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8423652114098600919}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.419, y: -0.444, z: 0.068}
+  m_LocalPosition: {x: -0.359, y: -0.484, z: 0.068}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3437,10 +3437,10 @@ ParentConstraint:
   m_Enabled: 1
   serializedVersion: 2
   m_Weight: 1
-  m_TranslationAtRest: {x: -0.419, y: -0.444, z: 0.068}
+  m_TranslationAtRest: {x: -0.359, y: -0.484, z: 0.068}
   m_RotationAtRest: {x: 0, y: 0, z: 0}
   m_TranslationOffsets:
-  - {x: 0.011575699, y: -0.037023067, z: -0.032986403}
+  - {x: 0.024279356, y: 0.03358078, z: -0.025659323}
   m_RotationOffsets:
   - {x: 9.837633, y: 93.423004, z: 130.11746}
   m_AffectTranslationX: 1
