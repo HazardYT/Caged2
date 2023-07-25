@@ -3,17 +3,17 @@ using Unity.Netcode;
 
 public class ItemTransform : NetworkBehaviour
 {
-    [SerializeField]
-    private Transform _handTransform;
-    [SerializeField]
-    private OwnerNetworkTransform ownerNetworkTransform;
-    public NetworkVariable<byte> equipSlot = new NetworkVariable<byte>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    [SerializeField] private Transform _handTransform;
+    [SerializeField] private OwnerNetworkTransform ownerNetworkTransform;
+    public NetworkVariable<byte> equipSlot = new NetworkVariable<byte>(0);
 
     public void OnTransformParentChanged()
     { 
+        print("1");
         if (transform.parent == null) 
             OnItemDropped();
         else 
+            print(equipSlot.Value);
             OnItemGrabbed(equipSlot.Value);
     }
 

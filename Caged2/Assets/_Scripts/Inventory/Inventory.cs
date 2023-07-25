@@ -75,7 +75,9 @@ public class Inventory : NetworkBehaviour
                     if (hit.transform.TryGetComponent<NetworkObject>(out NetworkObject networkObject))
                     {
                         NetworkObjectReference reference = new NetworkObjectReference(networkObject);
+                        print("Attempting Calling Equip");
                         SetEquipSlotServerRpc(networkObject.NetworkObjectId, i);
+                        print("Called Equip");
                         PickupItemServerRpc(i, reference);
                         return;
                     }
@@ -154,6 +156,7 @@ public class Inventory : NetworkBehaviour
     [ServerRpc]
     public void SetEquipSlotServerRpc(ulong id, byte slot)
     {
+        print("before set rpc");
         ItemTransform itemTransform = NetworkManager.SpawnManager.SpawnedObjects[id].transform.GetComponent<ItemTransform>();
         itemTransform.equipSlot.Value = slot;
         print("Setting value to " + slot);
