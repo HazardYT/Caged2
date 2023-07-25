@@ -75,7 +75,7 @@ public class Inventory : NetworkBehaviour
                     if (hit.transform.TryGetComponent<NetworkObject>(out NetworkObject networkObject))
                     {
                         NetworkObjectReference reference = new NetworkObjectReference(networkObject);
-                        print("Attempting Calling Equip");
+                        print("Attempting Calling Equip " + i);
                         SetEquipSlotServerRpc(networkObject.NetworkObjectId, i);
                         print("Called Equip");
                         PickupItemServerRpc(i, reference);
