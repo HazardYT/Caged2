@@ -14,19 +14,18 @@ public class ItemTransform : NetworkBehaviour
             OnItemDropped();
             return;
         }
-        int j = equipSlot.Value;
-        print(j + " : Curr Value");
-        Inventory inventory = transform.parent.GetComponent<Inventory>();
-        if (inventory._handItems[equipSlot.Value] != null){
-            equipSlot.Value = equipSlot.Value == 0 ? 1 : 0;
+        else
+        {
+            print(equipSlot.Value + " : Curr Value");
+            if (!transform.parent.TryGetComponent(out Inventory inventory)){
+                Debug.LogError("Failed to get Parent of Item");
+            }
+            /*if (inventory._handItems[equipSlot.Value] != null){
+                equipSlot.Value = equipSlot.Value == 0 ? 1 : 0;
+            }
+            */
+            OnItemGrabbed(equipSlot.Value);
         }
-        StartCoroutine(ItemStateCheck(j));
-    }
-    public IEnumerator ItemStateCheck(int j){
-        //yield return new WaitUntil(() => (equipSlot.Value != j));
-        yield return new WaitForEndOfFrame();
-        OnItemGrabbed(equipSlot.Value);
-        print(equipSlot.Value + " : New Value");
     }
 
     public void OnItemGrabbed(int i)

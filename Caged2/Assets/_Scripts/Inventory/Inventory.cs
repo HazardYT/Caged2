@@ -9,7 +9,7 @@ public class Inventory : NetworkBehaviour
     public Transform[] _handItems;
     [SerializeField] private Transform _selectedHandItem;
     [SerializeField] private InventoryVisuals visuals;
-    public NetworkVariable<int> _selectedSlot = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public NetworkVariable<int> _selectedSlot = new NetworkVariable<int>(-1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     private void Update()
     {
@@ -75,12 +75,9 @@ public class Inventory : NetworkBehaviour
                     if (hit.transform.TryGetComponent<NetworkObject>(out NetworkObject networkObject))
                     {
                         NetworkObjectReference reference = new NetworkObjectReference(networkObject);
-                        if (IsClient){
-                        _handItems[i] = networkObject.transform;
-                        }
                         print("Attempting Calling Equip " + i);
                         networkObject.GetComponent<ItemTransform>().SetEquipSlotServerRpc(networkObject.NetworkObjectId, i);
-                        print("Called Equip");
+                        print("Called Equip" + i);
                         PickupItemServerRpc(i, reference);
                         return;
                     }
@@ -113,7 +110,6 @@ public class Inventory : NetworkBehaviour
             Debug.LogError("Failed to Get Item NetworkObject: TryGet from NetworkObjectReference Failed.");
             return;
         }
-        _handItems[slot] = networkObject.transform;
         NetworkObjectReference playerNetworkObjectReference = new NetworkObjectReference(transform.GetComponent<NetworkObject>());
         UpdateHandItemsClientRpc(playerNetworkObjectReference, networkObjectReference, slot);
         var pickUpObjectRigidbody = networkObject.GetComponent<Rigidbody>();
@@ -141,6 +137,7 @@ public class Inventory : NetworkBehaviour
         playerNetworkObject.GetComponent<Inventory>()._handItems[slot] = networkObject.transform;
 
     }
+     
     [ServerRpc]
     public void DropSelectedItemServerRpc(ServerRpcParams rpcParams = default)
     {
