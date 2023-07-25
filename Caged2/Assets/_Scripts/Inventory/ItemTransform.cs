@@ -9,7 +9,6 @@ public class ItemTransform : NetworkBehaviour
 
     public void OnTransformParentChanged()
     { 
-        print("1");
         if (transform.parent == null) 
             OnItemDropped();
         else 
