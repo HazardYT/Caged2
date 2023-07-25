@@ -1,3 +1,4 @@
+using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ public class Inventory : NetworkBehaviour
     public Transform[] _handItems;
     [SerializeField] private Transform _selectedHandItem;
     [SerializeField] private InventoryVisuals visuals;
-    public NetworkVariable<int> _selectedSlot = new NetworkVariable<int>(-1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public NetworkVariable<int> _selectedSlot = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     private void Update()
     {
@@ -76,8 +77,8 @@ public class Inventory : NetworkBehaviour
                     {
                         NetworkObjectReference reference = new NetworkObjectReference(networkObject);
                         print("Attempting Calling Equip " + i);
+                        StartCoroutine(EquipSlotServerRpcDelay(reference, i));
                         PickupItemServerRpc(i, reference);
-                        networkObject.GetComponent<ItemTransform>().SetEquipSlotServerRpc(networkObject.NetworkObjectId, i);
                         print("Called Equip" + i);
                         return;
                     }
@@ -87,6 +88,13 @@ public class Inventory : NetworkBehaviour
                 Debug.LogError("Your Hands are Full!");
             }
         }
+    }
+    private IEnumerator EquipSlotServerRpcDelay(NetworkObjectReference reference, int i){
+        if (!reference.TryGet(out NetworkObject networkObject)){
+            Debug.LogError("Failed to get TryGet on Enumerator");
+        }
+        yield return new WaitForEndOfFrame();
+        networkObject.GetComponent<ItemTransform>().SetEquipSlotServerRpc(networkObject.NetworkObjectId, i);
     }
     public void SelectHand(int value)
     {
