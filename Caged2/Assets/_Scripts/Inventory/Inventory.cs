@@ -79,7 +79,7 @@ public class Inventory : NetworkBehaviour
                         _handItems[i] = networkObject.transform;
                         }
                         print("Attempting Calling Equip " + i);
-                        SetEquipSlotServerRpc(networkObject.NetworkObjectId, i);
+                        networkObject.GetComponent<ItemTransform>().SetEquipSlotServerRpc(networkObject.NetworkObjectId, i);
                         print("Called Equip");
                         PickupItemServerRpc(i, reference);
                         return;
@@ -155,13 +155,5 @@ public class Inventory : NetworkBehaviour
     public void SetSelectedSlotServerRpc(byte slot, ServerRpcParams rpcParams = default){
         Inventory inventory = NetworkManager.ConnectedClients[rpcParams.Receive.SenderClientId].PlayerObject.GetComponent<Inventory>();
         inventory._selectedSlot.Value = slot;
-    }
-    [ServerRpc]
-    public void SetEquipSlotServerRpc(ulong id, byte slot)
-    {
-        print("before set rpc");
-        ItemTransform itemTransform = NetworkManager.SpawnManager.SpawnedObjects[id].transform.GetComponent<ItemTransform>();
-        itemTransform.equipSlot.Value = slot;
-        print("Setting value to " + slot);
     }
 }
