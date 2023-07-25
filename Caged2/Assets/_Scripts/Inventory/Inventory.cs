@@ -75,7 +75,7 @@ public class Inventory : NetworkBehaviour
                     if (hit.transform.TryGetComponent<NetworkObject>(out NetworkObject networkObject))
                     {
                         NetworkObjectReference reference = new NetworkObjectReference(networkObject);
-                        networkObject.GetComponent<ItemTransform>().SetEquipSlotServerRpc(networkObject.NetworkObjectId, i);
+                        SetEquipSlotServerRpc(networkObject.NetworkObjectId, i);
                         PickupItemServerRpc(i, reference);
                         return;
                     }
@@ -150,5 +150,12 @@ public class Inventory : NetworkBehaviour
     public void SetSelectedSlotServerRpc(byte slot, ServerRpcParams rpcParams = default){
         Inventory inventory = NetworkManager.ConnectedClients[rpcParams.Receive.SenderClientId].PlayerObject.GetComponent<Inventory>();
         inventory._selectedSlot.Value = slot;
+    }
+    [ServerRpc]
+    public void SetEquipSlotServerRpc(ulong id, byte slot)
+    {
+        ItemTransform itemTransform = NetworkManager.SpawnManager.SpawnedObjects[id].transform.GetComponent<ItemTransform>();
+        itemTransform.equipSlot.Value = slot;
+        print("Setting value to " + slot);
     }
 }

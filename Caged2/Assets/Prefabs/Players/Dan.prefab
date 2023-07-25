@@ -873,7 +873,8 @@ MonoBehaviour:
   - {fileID: 0}
   _selectedHandItem: {fileID: 0}
   visuals: {fileID: 5532980212006723302}
-  _selectedSlot: 0
+  _selectedSlot:
+    m_InternalValue: 0
 --- !u!114 &1925133852194156374
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1040,9 +1041,9 @@ MonoBehaviour:
   SyncPositionX: 1
   SyncPositionY: 1
   SyncPositionZ: 1
-  SyncRotAngleX: 0
+  SyncRotAngleX: 1
   SyncRotAngleY: 1
-  SyncRotAngleZ: 0
+  SyncRotAngleZ: 1
   SyncScaleX: 0
   SyncScaleY: 0
   SyncScaleZ: 0
