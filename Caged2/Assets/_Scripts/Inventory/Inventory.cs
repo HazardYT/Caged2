@@ -105,7 +105,7 @@ public class Inventory : NetworkBehaviour
         }
 
         _selectedHandItem = _handItems[value];
-        _selectedSlot.Value = value;
+        SetSelectedSlotServerRpc(value);
         _selectedHandItem.localScale *= 1.25f;
     }
     [ServerRpc]
