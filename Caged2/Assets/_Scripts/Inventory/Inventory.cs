@@ -76,9 +76,9 @@ public class Inventory : NetworkBehaviour
                     {
                         NetworkObjectReference reference = new NetworkObjectReference(networkObject);
                         print("Attempting Calling Equip " + i);
+                        PickupItemServerRpc(i, reference);
                         networkObject.GetComponent<ItemTransform>().SetEquipSlotServerRpc(networkObject.NetworkObjectId, i);
                         print("Called Equip" + i);
-                        PickupItemServerRpc(i, reference);
                         return;
                     }
                     else Debug.LogError("Failed To Get Component [NetworkObject] from Item");
@@ -110,16 +110,16 @@ public class Inventory : NetworkBehaviour
             Debug.LogError("Failed to Get Item NetworkObject: TryGet from NetworkObjectReference Failed.");
             return;
         }
-        NetworkObjectReference playerNetworkObjectReference = new NetworkObjectReference(transform.GetComponent<NetworkObject>());
-        UpdateHandItemsClientRpc(playerNetworkObjectReference, networkObjectReference, slot);
-        var pickUpObjectRigidbody = networkObject.GetComponent<Rigidbody>();
-        pickUpObjectRigidbody.isKinematic = true;
-        pickUpObjectRigidbody.interpolation = RigidbodyInterpolation.None;
         if (!networkObject.TrySetParent(transform, false))
         {
             Debug.LogError("Failed to Parent Item: TrySetParent Failed.");
             return;
         }
+        NetworkObjectReference playerNetworkObjectReference = new NetworkObjectReference(transform.GetComponent<NetworkObject>());
+        UpdateHandItemsClientRpc(playerNetworkObjectReference, networkObjectReference, slot);
+        var pickUpObjectRigidbody = networkObject.GetComponent<Rigidbody>();
+        pickUpObjectRigidbody.isKinematic = true;
+        pickUpObjectRigidbody.interpolation = RigidbodyInterpolation.None;
         SelectHand(slot);
     }
     [ClientRpc]

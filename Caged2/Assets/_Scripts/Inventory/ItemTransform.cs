@@ -1,6 +1,5 @@
 using UnityEngine;
 using Unity.Netcode;
-using System.Collections;
 
 public class ItemTransform : NetworkBehaviour
 {
@@ -8,24 +7,23 @@ public class ItemTransform : NetworkBehaviour
     [SerializeField] private OwnerNetworkTransform ownerNetworkTransform;
     public NetworkVariable<int> equipSlot = new NetworkVariable<int>(-1);
 
-    public void OnTransformParentChanged()
-    { 
-        if (transform.parent == null){
-            OnItemDropped();
-            return;
+
+    public override void OnNetworkObjectParentChanged(NetworkObject parentNetworkObject)
+    {
+        if (transform.parent != null){
+            equipSlot.OnValueChanged += ItemStateCheck;
+            print(equipSlot.Value + " : Curr Value");
         }
         else
         {
-            print(equipSlot.Value + " : Curr Value");
-            if (!transform.parent.TryGetComponent(out Inventory inventory)){
-                Debug.LogError("Failed to get Parent of Item");
-            }
-            /*if (inventory._handItems[equipSlot.Value] != null){
-                equipSlot.Value = equipSlot.Value == 0 ? 1 : 0;
-            }
-            */
-            OnItemGrabbed(equipSlot.Value);
+            OnItemDropped();
+            return;
         }
+    }
+    public void ItemStateCheck(int previousValue, int newValue){
+        OnItemGrabbed(newValue);
+        print($"Prev Value: {previousValue} \nNew Value: {newValue}");
+        equipSlot.OnValueChanged -= ItemStateCheck;
     }
 
     public void OnItemGrabbed(int i)
