@@ -5,7 +5,7 @@ public class ItemTransform : NetworkBehaviour
 {
     [SerializeField] private Transform _handTransform;
     [SerializeField] private OwnerNetworkTransform ownerNetworkTransform;
-    public NetworkVariable<int> equipSlot = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public NetworkVariable<int> equipSlot = new NetworkVariable<int>(-1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     public override void OnNetworkObjectParentChanged(NetworkObject parentNetworkObject)
     {
