@@ -10,8 +10,7 @@ public class ItemTransform : NetworkBehaviour
     public override void OnNetworkObjectParentChanged(NetworkObject parentNetworkObject)
     {
         if (transform.parent != null){
-            equipSlot.OnValueChanged += ItemStateCheck;
-            print(equipSlot.Value + " : Curr Value");
+            equipSlot.OnValueChanged += OnItemGrabbed;
         }
         else
         {
@@ -19,14 +18,9 @@ public class ItemTransform : NetworkBehaviour
             return;
         }
     }
-    public void ItemStateCheck(int previousValue, int newValue){
-        OnItemGrabbed(newValue);
-        print($"Prev Value: {previousValue} \nNew Value: {newValue}");
-    }
-
-    public void OnItemGrabbed(int i)
+    public void OnItemGrabbed(int previousValue, int newValue)
     {
-        _handTransform = transform.root.GetChild(0).GetChild(i);
+        _handTransform = transform.root.GetChild(0).GetChild(newValue);
         ownerNetworkTransform.enabled = false;
     }
 
@@ -34,7 +28,7 @@ public class ItemTransform : NetworkBehaviour
     {
         _handTransform = null;
         ownerNetworkTransform.enabled = true;
-        equipSlot.OnValueChanged -= ItemStateCheck;
+        equipSlot.OnValueChanged -= OnItemGrabbed;
         SetEquipSlotServerRpc(GetComponent<NetworkObject>().NetworkObjectId, -1);
     }
 
