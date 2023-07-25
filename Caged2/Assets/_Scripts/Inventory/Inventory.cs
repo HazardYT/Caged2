@@ -75,6 +75,9 @@ public class Inventory : NetworkBehaviour
                     if (hit.transform.TryGetComponent<NetworkObject>(out NetworkObject networkObject))
                     {
                         NetworkObjectReference reference = new NetworkObjectReference(networkObject);
+                        if (IsClient){
+                        _handItems[i] = networkObject.transform;
+                        }
                         print("Attempting Calling Equip " + i);
                         SetEquipSlotServerRpc(networkObject.NetworkObjectId, i);
                         print("Called Equip");
@@ -136,8 +139,8 @@ public class Inventory : NetworkBehaviour
         pickUpObjectRigidbody.isKinematic = false;
         pickUpObjectRigidbody.interpolation = RigidbodyInterpolation.Interpolate;
         networkObject.GetComponent<ItemTransform>().OnItemDropped();
-        _selectedHandItem = null;
         _handItems[_selectedSlot.Value] = null;
+        _selectedHandItem = null;
         networkObject.transform.position = cam.transform.position;
         pickUpObjectRigidbody.AddForce(cam.transform.forward * 4, ForceMode.Impulse);
         for (byte i = 0; i < _handItems.Length; i++)
