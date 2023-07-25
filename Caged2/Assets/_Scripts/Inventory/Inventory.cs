@@ -9,7 +9,7 @@ public class Inventory : NetworkBehaviour
     public Transform[] _handItems;
     [SerializeField] private Transform _selectedHandItem;
     [SerializeField] private InventoryVisuals visuals;
-    public NetworkVariable<byte> _selectedSlot = new NetworkVariable<byte>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public NetworkVariable<int> _selectedSlot = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     private void Update()
     {
@@ -68,7 +68,7 @@ public class Inventory : NetworkBehaviour
         {
             if (hit.transform.CompareTag("Item"))
             {
-                for (byte i = 0; i < _handItems.Length; i++)
+                for (int i = 0; i < _handItems.Length; i++)
                 {
                     if (_handItems[i] != null) continue;
 
@@ -91,7 +91,7 @@ public class Inventory : NetworkBehaviour
             }
         }
     }
-    public void SelectHand(byte value)
+    public void SelectHand(int value)
     {
         if (_selectedHandItem != null)
         {
@@ -104,7 +104,7 @@ public class Inventory : NetworkBehaviour
         _selectedHandItem.localScale *= 1.25f;
     }
     [ServerRpc]
-    public void PickupItemServerRpc(byte slot, NetworkObjectReference networkObjectReference, ServerRpcParams rpcParams = default)
+    public void PickupItemServerRpc(int slot, NetworkObjectReference networkObjectReference, ServerRpcParams rpcParams = default)
     {
         Transform transform = NetworkManager.ConnectedClients[rpcParams.Receive.SenderClientId].PlayerObject.transform;
 
@@ -114,6 +114,8 @@ public class Inventory : NetworkBehaviour
             return;
         }
         _handItems[slot] = networkObject.transform;
+        NetworkObjectReference playerNetworkObjectReference = new NetworkObjectReference(transform.GetComponent<NetworkObject>());
+        UpdateHandItemsClientRpc(playerNetworkObjectReference, networkObjectReference, slot);
         var pickUpObjectRigidbody = networkObject.GetComponent<Rigidbody>();
         pickUpObjectRigidbody.isKinematic = true;
         pickUpObjectRigidbody.interpolation = RigidbodyInterpolation.None;
@@ -124,7 +126,21 @@ public class Inventory : NetworkBehaviour
         }
         SelectHand(slot);
     }
+    [ClientRpc]
+    public void UpdateHandItemsClientRpc(NetworkObjectReference senderNetworkObjectReference, NetworkObjectReference networkObjectReference, int slot){
+        if (!networkObjectReference.TryGet(out NetworkObject networkObject))
+        {
+            Debug.LogError("Failed to Get Item NetworkObject: TryGet from NetworkObjectReference Failed.");
+            return;
+        }
+        if (!senderNetworkObjectReference.TryGet(out NetworkObject playerNetworkObject))
+        {
+            Debug.LogError("Failed to Get Item NetworkObject: TryGet from NetworkObjectReference Failed.");
+            return;
+        }
+        playerNetworkObject.GetComponent<Inventory>()._handItems[slot] = networkObject.transform;
 
+    }
     [ServerRpc]
     public void DropSelectedItemServerRpc(ServerRpcParams rpcParams = default)
     {
@@ -143,7 +159,7 @@ public class Inventory : NetworkBehaviour
         _selectedHandItem = null;
         networkObject.transform.position = cam.transform.position;
         pickUpObjectRigidbody.AddForce(cam.transform.forward * 4, ForceMode.Impulse);
-        for (byte i = 0; i < _handItems.Length; i++)
+        for (int i = 0; i < _handItems.Length; i++)
         {
             if (_handItems[i] != null)
             {
@@ -152,7 +168,7 @@ public class Inventory : NetworkBehaviour
         }
     }
     [ServerRpc]
-    public void SetSelectedSlotServerRpc(byte slot, ServerRpcParams rpcParams = default){
+    public void SetSelectedSlotServerRpc(int slot, ServerRpcParams rpcParams = default){
         Inventory inventory = NetworkManager.ConnectedClients[rpcParams.Receive.SenderClientId].PlayerObject.GetComponent<Inventory>();
         inventory._selectedSlot.Value = slot;
     }

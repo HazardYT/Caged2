@@ -6,24 +6,30 @@ public class ItemTransform : NetworkBehaviour
 {
     [SerializeField] private Transform _handTransform;
     [SerializeField] private OwnerNetworkTransform ownerNetworkTransform;
-    public NetworkVariable<byte> equipSlot = new NetworkVariable<byte>(0);
+    public NetworkVariable<int> equipSlot = new NetworkVariable<int>(-1);
 
     public void OnTransformParentChanged()
     { 
-        byte j = equipSlot.Value;
+        if (transform.parent == null){
+            OnItemDropped();
+            return;
+        }
+        int j = equipSlot.Value;
         print(j + " : Curr Value");
+        Inventory inventory = transform.parent.GetComponent<Inventory>();
+        if (inventory._handItems[equipSlot.Value] != null){
+            equipSlot.Value = equipSlot.Value == 0 ? 1 : 0;
+        }
         StartCoroutine(ItemStateCheck(j));
     }
-    public IEnumerator ItemStateCheck(byte j){
-        yield return new WaitUntil(() => (j != equipSlot.Value));
-        if (transform.parent == null) 
-            OnItemDropped();
-        else 
-            print(equipSlot.Value + " : New Value");
-            OnItemGrabbed(equipSlot.Value);
+    public IEnumerator ItemStateCheck(int j){
+        //yield return new WaitUntil(() => (equipSlot.Value != j));
+        yield return new WaitForEndOfFrame();
+        OnItemGrabbed(equipSlot.Value);
+        print(equipSlot.Value + " : New Value");
     }
 
-    public void OnItemGrabbed(byte i)
+    public void OnItemGrabbed(int i)
     {
         _handTransform = transform.root.GetChild(0).GetChild(i);
         ownerNetworkTransform.enabled = false;
@@ -47,8 +53,8 @@ public class ItemTransform : NetworkBehaviour
         transform.rotation = _handTransform.rotation;
     }
 
-    [ServerRpc]
-    public void SetEquipSlotServerRpc(ulong id, byte slot)
+    [ServerRpc(RequireOwnership = false)]
+    public void SetEquipSlotServerRpc(ulong id, int slot)
     {
         print("before set rpc");
         ItemTransform itemTransform = NetworkManager.SpawnManager.SpawnedObjects[id].transform.GetComponent<ItemTransform>();
