@@ -71,7 +71,7 @@ public class Inventory : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void PickupItemServerRpc(NetworkObjectReference networkObjectReference, int slot, ServerRpcParams serverRpcParams = default){
+    public void PickupItemServerRpc(NetworkObjectReference networkObjectReference, int slot, ServerRpcParams serverRpcParams = default){
         NetworkObject playerNetworkObject = NetworkManager.Singleton.ConnectedClients[serverRpcParams.Receive.SenderClientId].PlayerObject;
         Inventory inventory = playerNetworkObject.GetComponent<Inventory>();
 
@@ -87,7 +87,7 @@ public class Inventory : NetworkBehaviour
 
     }
     [ClientRpc]
-    private void UpdateClientsOnItemChangeClientRpc(NetworkObjectReference playerReference, NetworkObjectReference objectReference, int slot){
+    public void UpdateClientsOnItemChangeClientRpc(NetworkObjectReference playerReference, NetworkObjectReference objectReference, int slot){
 
         if (!objectReference.TryGet(out NetworkObject networkObject)) { Debug.LogError("Failed to Get Item NetworkObject: TryGet from NetworkObjectReference Failed."); return; }
 
@@ -98,7 +98,7 @@ public class Inventory : NetworkBehaviour
         inv.SetSelectedSlotServerRpc(slot);
     }
     [ServerRpc]
-    private void ThrowItemServerRpc(ServerRpcParams rpcParams = default){
+    public void ThrowItemServerRpc(ServerRpcParams rpcParams = default){
         NetworkObject playerNetworkObject = NetworkManager.ConnectedClients[rpcParams.Receive.SenderClientId].PlayerObject;
         Inventory inventory = playerNetworkObject.GetComponent<Inventory>();
         NetworkObject networkObject = inventory._handItems[inventory._selectedSlot.Value].GetComponent<NetworkObject>();
@@ -130,7 +130,7 @@ public class Inventory : NetworkBehaviour
 
     }
     [ServerRpc]
-    private void SetSelectedSlotServerRpc(int slot, bool n = true, ServerRpcParams serverRpcParams = default){
+    public void SetSelectedSlotServerRpc(int slot, bool n = true, ServerRpcParams serverRpcParams = default){
         NetworkObject networkObject = NetworkManager.Singleton.ConnectedClients[serverRpcParams.Receive.SenderClientId].PlayerObject;
         Inventory inventory = networkObject.GetComponent<Inventory>();
         inventory._selectedSlot.Value = slot;
@@ -139,14 +139,14 @@ public class Inventory : NetworkBehaviour
         SelectItemBySlotClientRpc(slot, reference);
     }
     [ServerRpc(RequireOwnership = false)]
-    private void SetItemTransformSlotServerRpc(ulong id, int slot)
+    public void SetItemTransformSlotServerRpc(ulong id, int slot)
     {
         ItemTransform itemTransform = NetworkManager.SpawnManager.SpawnedObjects[id].transform.GetComponent<ItemTransform>();
         itemTransform.Slot.Value = slot;
         print(slot);
     }
     [ClientRpc]
-    private void SelectItemBySlotClientRpc(int Value, NetworkObjectReference networkObjectReference, bool other = true){
+    public void SelectItemBySlotClientRpc(int Value, NetworkObjectReference networkObjectReference, bool other = true){
         if (!networkObjectReference.TryGet(out NetworkObject playerNetworkObject)) { Debug.LogError("Failed to Get Item NetworkObject: TryGet from NetworkObjectReference Failed."); return; }
         Inventory inventory = playerNetworkObject.GetComponent<Inventory>();
         for (int i = 0; i < inventory._handItems.Length; i++)
