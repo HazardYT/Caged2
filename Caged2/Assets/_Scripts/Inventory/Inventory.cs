@@ -137,7 +137,7 @@ public class Inventory : NetworkBehaviour
         if (n)
         SelectItemBySlotClientRpc(slot, reference);
     }
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void SetItemTransformSlotServerRpc(ulong id, int slot)
     {
         ItemTransform itemTransform = NetworkManager.SpawnManager.SpawnedObjects[id].transform.GetComponent<ItemTransform>();
