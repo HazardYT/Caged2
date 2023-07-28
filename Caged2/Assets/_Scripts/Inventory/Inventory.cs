@@ -19,6 +19,7 @@ public class Inventory : NetworkBehaviour
         }
     }
     private void Update(){
+        if (!IsOwner) return;
         HandleInput();
     }
     private void HandleInput()
