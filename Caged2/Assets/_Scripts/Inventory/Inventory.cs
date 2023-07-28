@@ -9,9 +9,9 @@ public class Inventory : NetworkBehaviour
     public NetworkObject[] _handItems;
     [Header("Variables")]
     private NetworkObjectReference playerNetworkObjectReference;
-    [SerializeField] private Camera playerCamera;
+    public Camera playerCamera;
     [SerializeField] private LayerMask layerMask;
-    [SerializeField] private NetworkVariable<int> _selectedSlot = new NetworkVariable<int>(-1);
+    [SerializeField] public NetworkVariable<int> _selectedSlot = new NetworkVariable<int>(-1);
     public override void OnNetworkSpawn()
     {
         if (IsOwner && IsLocalPlayer){
@@ -38,6 +38,7 @@ public class Inventory : NetworkBehaviour
         if (UserInput.instance.ThrowReleased){
             if (_handItems[_selectedSlot.Value] != null){
                 ThrowItemServerRpc();
+                
             }
         }
     }
@@ -122,11 +123,8 @@ public class Inventory : NetworkBehaviour
 
         DropSelectedItemClientRpc(playerNetworkObjectReference);
 
-        SetItemTransformSlotServerRpc(networkObject.NetworkObjectId, -1);
-
         SelectItemBySlotClientRpc(_selectedSlot.Value, playerNetworkObjectReference, false);
 
-        SetSelectedSlotServerRpc(i, false);
 
     }
     [ServerRpc]
