@@ -68,6 +68,7 @@ public class Inventory : NetworkBehaviour
         PickupItemServerRpc(networkObjectReference, slot);
         yield return new WaitForEndOfFrame();
         SetItemTransformSlotServerRpc(networkObject.NetworkObjectId, slot);
+        SetSelectedSlotServerRpc(slot);
     }
     private void ThrowItem(){
         ThrowItemServerRpc();
@@ -88,7 +89,6 @@ public class Inventory : NetworkBehaviour
 
         NetworkObjectReference playerReference = new NetworkObjectReference(playerNetworkObject);
         UpdateClientsOnItemChangeClientRpc(playerReference, networkObjectReference, slot);
-        SetSelectedSlotServerRpc(slot);
         Rigidbody pickUpObjectRigidbody = networkObject.GetComponent<Rigidbody>();
         pickUpObjectRigidbody.isKinematic = true;
         pickUpObjectRigidbody.interpolation = RigidbodyInterpolation.None;
@@ -109,9 +109,8 @@ public class Inventory : NetworkBehaviour
         NetworkObject playerNetworkObject = NetworkManager.ConnectedClients[rpcParams.Receive.SenderClientId].PlayerObject;
         Inventory inventory = playerNetworkObject.GetComponent<Inventory>();
         NetworkObject networkObject = inventory._handItems[inventory._selectedSlot.Value].GetComponent<NetworkObject>();
-        Camera camera = inventory.playerCamera;
+        Camera camera = playerCamera;
         Rigidbody pickUpObjectRigidbody = networkObject.GetComponent<Rigidbody>();
-        int i = inventory._selectedSlot.Value == 0 ? 1 : 0;
         if (!networkObject.TryRemoveParent(true))
         {
             Debug.LogError("Failed to Drop item Because: TryRemoveParent Failed.");
@@ -137,7 +136,6 @@ public class Inventory : NetworkBehaviour
         NetworkObject networkObject = NetworkManager.Singleton.ConnectedClients[serverRpcParams.Receive.SenderClientId].PlayerObject;
         Inventory inventory = networkObject.GetComponent<Inventory>();
         inventory._selectedSlot.Value = slot;
-        NetworkObjectReference reference = new NetworkObjectReference(networkObject);
     }
     [ServerRpc(RequireOwnership = false)]
     public void SetItemTransformSlotServerRpc(ulong id, int slot)
