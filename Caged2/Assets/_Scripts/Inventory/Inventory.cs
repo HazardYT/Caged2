@@ -123,18 +123,19 @@ public class Inventory : NetworkBehaviour
 
         DropSelectedItemClientRpc(playerNetworkObjectReference);
 
-        SelectItemBySlotClientRpc(_selectedSlot.Value, playerNetworkObjectReference, false);
+        int slot = _selectedSlot.Value == 0 ? 1 : 0;
+        SetSelectedSlotServerRpc(slot);
+
+        SetItemTransformSlotServerRpc(networkObject.NetworkObjectId, -1);
 
 
     }
     [ServerRpc]
-    public void SetSelectedSlotServerRpc(int slot, bool n = true, ServerRpcParams serverRpcParams = default){
+    public void SetSelectedSlotServerRpc(int slot, ServerRpcParams serverRpcParams = default){
         NetworkObject networkObject = NetworkManager.Singleton.ConnectedClients[serverRpcParams.Receive.SenderClientId].PlayerObject;
         Inventory inventory = networkObject.GetComponent<Inventory>();
         inventory._selectedSlot.Value = slot;
         NetworkObjectReference reference = new NetworkObjectReference(networkObject);
-        if (n)
-        SelectItemBySlotClientRpc(slot, reference);
     }
     [ServerRpc(RequireOwnership = false)]
     public void SetItemTransformSlotServerRpc(ulong id, int slot)
@@ -144,28 +145,6 @@ public class Inventory : NetworkBehaviour
         print(slot);
     }
     [ClientRpc]
-    public void SelectItemBySlotClientRpc(int Value, NetworkObjectReference networkObjectReference, bool other = true){
-        if (!networkObjectReference.TryGet(out NetworkObject playerNetworkObject)) { Debug.LogError("Failed to Get Item NetworkObject: TryGet from NetworkObjectReference Failed."); return; }
-        Inventory inventory = playerNetworkObject.GetComponent<Inventory>();
-        for (int i = 0; i < inventory._handItems.Length; i++)
-        {
-            if (other){
-                if (i == Value){
-                    inventory._handItems[i].transform.localScale *= 1.15f;
-                }
-                if (i != Value && inventory._handItems[i] != null){
-                    inventory._handItems[i].transform.localScale /= 1.15f;
-                }       
-            }
-            else
-            {
-                if (inventory._handItems[i] != null){
-                    inventory._handItems[i].transform.localScale *= 1.15f;
-                }
-            }
-        }
-    }
-    [ClientRpc]
     public void DropSelectedItemClientRpc(NetworkObjectReference senderNetworkObjectReference){
         if (!senderNetworkObjectReference.TryGet(out NetworkObject playerNetworkObject))
         {
@@ -173,7 +152,6 @@ public class Inventory : NetworkBehaviour
             return;
         }
         Inventory inventory = playerNetworkObject.GetComponent<Inventory>();
-        inventory._handItems[_selectedSlot.Value].transform.localScale /= 1.15f;
         inventory._handItems[_selectedSlot.Value] = null;
 
     }
