@@ -24,7 +24,6 @@ public class Inventory : NetworkBehaviour
     }
     private void HandleInput()
     {
-        if (!IsOwner && IsLocalPlayer) return;
         if (UserInput.instance.RightHandPressed){
             if (_handItems[0] != null && _selectedSlot.Value != 0)
                 SetSelectedSlotServerRpc(0);
@@ -38,13 +37,11 @@ public class Inventory : NetworkBehaviour
         }
         if (UserInput.instance.ThrowReleased){
             if (_handItems[_selectedSlot.Value] != null){
-                ThrowItemServerRpc();
-                
+                ThrowItem();
             }
         }
     }
     public void InteractItem(){
-        if (!IsOwner && IsLocalPlayer) return;
         if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out RaycastHit hit, 5, layerMask))
         {
             if (hit.transform.CompareTag("Item"))
@@ -71,6 +68,13 @@ public class Inventory : NetworkBehaviour
         PickupItemServerRpc(networkObjectReference, slot);
         yield return new WaitForEndOfFrame();
         SetItemTransformSlotServerRpc(networkObject.NetworkObjectId, slot);
+    }
+    private void ThrowItem(){
+        ThrowItemServerRpc();
+        int slot = _selectedSlot.Value == 0 ? 1 : 0;
+        SetItemTransformSlotServerRpc(_handItems[_selectedSlot.Value].NetworkObjectId, -1);
+        SetSelectedSlotServerRpc(slot);
+
     }
 
     [ServerRpc]
@@ -125,10 +129,6 @@ public class Inventory : NetworkBehaviour
 
         DropSelectedItemClientRpc(playerNetworkObjectReference);
 
-        int slot = _selectedSlot.Value == 0 ? 1 : 0;
-        SetSelectedSlotServerRpc(slot);
-
-        SetItemTransformSlotServerRpc(networkObject.NetworkObjectId, -1);
 
 
     }
