@@ -65,16 +65,24 @@ public class Inventory : NetworkBehaviour
     }
     private IEnumerator HandeItemPickup(int slot, NetworkObject networkObject){
         NetworkObjectReference networkObjectReference = new NetworkObjectReference(networkObject);
+        networkObject.GetComponent<ItemTransform>().ChangeOwnershipServerRpc(networkObjectReference);
         PickupItemServerRpc(networkObjectReference, slot);
         yield return new WaitForEndOfFrame();
         SetItemTransformSlotServerRpc(networkObject.NetworkObjectId, slot);
         SetSelectedSlotServerRpc(slot);
     }
     private void ThrowItem(){
-        ThrowItemServerRpc(playerCamera.transform.position, playerCamera.transform.forward);
+        ThrowItemServerRpc(playerCamera.transform.forward);
         int slot = _selectedSlot.Value == 0 ? 1 : 0;
         SetItemTransformSlotServerRpc(_handItems[_selectedSlot.Value].NetworkObjectId, -1);
         SetSelectedSlotServerRpc(slot);
+        NetworkObject networkObject = _handItems[_selectedSlot.Value].GetComponent<NetworkObject>();
+        Rigidbody pickUpObjectRigidbody = networkObject.GetComponent<Rigidbody>();
+        pickUpObjectRigidbody.isKinematic = false;
+
+        networkObject.transform.position = playerCamera.transform.forward;
+
+        pickUpObjectRigidbody.AddForce(playerCamera.transform.forward * 2, ForceMode.Impulse);
 
     }
 
@@ -91,7 +99,6 @@ public class Inventory : NetworkBehaviour
         UpdateClientsOnItemChangeClientRpc(playerReference, networkObjectReference, slot);
         Rigidbody pickUpObjectRigidbody = networkObject.GetComponent<Rigidbody>();
         pickUpObjectRigidbody.isKinematic = true;
-        pickUpObjectRigidbody.interpolation = RigidbodyInterpolation.None;
 
     }
     [ClientRpc]
@@ -105,23 +112,21 @@ public class Inventory : NetworkBehaviour
         inv._handItems[slot] = networkObject;
     }
     [ServerRpc]
-    public void ThrowItemServerRpc(Vector3 Position, Vector3 Direction, ServerRpcParams rpcParams = default){
+    public void ThrowItemServerRpc(Vector3 Direction, ServerRpcParams rpcParams = default){
         NetworkObject playerNetworkObject = NetworkManager.ConnectedClients[rpcParams.Receive.SenderClientId].PlayerObject;
         Inventory inventory = playerNetworkObject.GetComponent<Inventory>();
         NetworkObject networkObject = inventory._handItems[inventory._selectedSlot.Value].GetComponent<NetworkObject>();
-        Rigidbody pickUpObjectRigidbody = networkObject.GetComponent<Rigidbody>();
         if (!networkObject.TryRemoveParent(true))
         {
             Debug.LogError("Failed to Drop item Because: TryRemoveParent Failed.");
             return;
         }
-        pickUpObjectRigidbody.isKinematic = false;
+       // Rigidbody pickUpObjectRigidbody = networkObject.GetComponent<Rigidbody>();
+        //pickUpObjectRigidbody.isKinematic = false;
 
-        pickUpObjectRigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+        //networkObject.transform.position = Direction;
 
-        networkObject.transform.position = Position;
-
-        pickUpObjectRigidbody.AddForce(Direction * 2, ForceMode.Impulse);
+        //pickUpObjectRigidbody.AddForce(Direction * 2, ForceMode.Impulse);
 
         NetworkObjectReference playerNetworkObjectReference = new NetworkObjectReference(playerNetworkObject);
 

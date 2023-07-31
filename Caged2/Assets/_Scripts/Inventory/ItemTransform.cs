@@ -4,7 +4,7 @@ using Unity.Netcode;
 public class ItemTransform : NetworkBehaviour
 {
     [SerializeField] private Transform _handTransform;
-    public NetworkVariable<int> Slot = new NetworkVariable<int>(-1);
+    public NetworkVariable<int> Slot = new NetworkVariable<int>(-1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
     public override void OnNetworkObjectParentChanged(NetworkObject parentNetworkObject)
     {
@@ -43,5 +43,9 @@ public class ItemTransform : NetworkBehaviour
         transform.position = _handTransform.position;
         transform.rotation = _handTransform.rotation;
     }
-
+    [ServerRpc(RequireOwnership = false)]
+    public void ChangeOwnershipServerRpc(NetworkObjectReference networkObjectReference, ServerRpcParams rpcParams = default){
+        if (!networkObjectReference.TryGet(out NetworkObject networkObject)) {Debug.LogError("Cant get Network object out of Reference in ChangeOwnership on Item Transform"); return; }
+        networkObject.ChangeOwnership(rpcParams.Receive.SenderClientId);
+    }
 }
