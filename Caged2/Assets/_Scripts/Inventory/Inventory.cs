@@ -19,15 +19,15 @@ public class Inventory : NetworkBehaviour
         }
     }
     private void Update(){
-        if (!IsOwner) return;
+        if (!IsOwner && IsLocalPlayer) return;
         HandleInput();
     }
     private void HandleInput()
     {
-        if (!IsOwner) return;
+        if (!IsOwner && IsLocalPlayer) return;
         if (UserInput.instance.RightHandPressed){
             if (_handItems[0] != null && _selectedSlot.Value != 0)
-            SetSelectedSlotServerRpc(0);
+                SetSelectedSlotServerRpc(0);
         }
         if (UserInput.instance.LeftHandPressed){
             if (_handItems[1] != null && _selectedSlot.Value != 1)
@@ -44,7 +44,7 @@ public class Inventory : NetworkBehaviour
         }
     }
     public void InteractItem(){
-        if (!IsOwner) return;
+        if (!IsOwner && IsLocalPlayer) return;
         if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out RaycastHit hit, 5, layerMask))
         {
             if (hit.transform.CompareTag("Item"))
