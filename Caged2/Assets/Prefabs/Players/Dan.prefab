@@ -952,7 +952,7 @@ MonoBehaviour:
   _handItems:
   - {fileID: 0}
   - {fileID: 0}
-  playerCamera: {fileID: 4938463692139139297}
+  playerCamera: {fileID: 1877340958170974056}
   layerMask:
     serializedVersion: 2
     m_Bits: 64
