@@ -84,6 +84,7 @@ public class Inventory : NetworkBehaviour
 
         NetworkObjectReference playerReference = new NetworkObjectReference(playerNetworkObject);
         UpdateClientsOnItemChangeClientRpc(playerReference, networkObjectReference, slot);
+        SetSelectedSlotServerRpc(slot);
         Rigidbody pickUpObjectRigidbody = networkObject.GetComponent<Rigidbody>();
         pickUpObjectRigidbody.isKinematic = true;
         pickUpObjectRigidbody.interpolation = RigidbodyInterpolation.None;
@@ -98,7 +99,6 @@ public class Inventory : NetworkBehaviour
 
         Inventory inv = playerNetworkObject.GetComponent<Inventory>();
         inv._handItems[slot] = networkObject;
-        inv.SetSelectedSlotServerRpc(slot);
     }
     [ServerRpc]
     public void ThrowItemServerRpc(ServerRpcParams rpcParams = default){
