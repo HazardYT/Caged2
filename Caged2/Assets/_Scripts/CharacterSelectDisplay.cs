@@ -30,7 +30,7 @@ public class CharacterSelectDisplay : NetworkBehaviour
                 selectButtonInstance.SetCharacter(this, character);
             }
             players.OnListChanged += HandlePlayersStateChanged;
-            localPlayerName = SteamManager.steamName;
+            localPlayerName = Steamworks.SteamClient.Name;
         }
         if (IsServer){
             NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;

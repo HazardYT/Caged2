@@ -29,7 +29,7 @@ public class Inventory : NetworkBehaviour
             if (_handItems[0] != null && _selectedSlot.Value != 0)
                 SetSelectedSlotServerRpc(0);
         }
-        if (UserInput.instance.LeftHandPressed){
+        if (UserInput.instance.LeftHandPressed && _handItems.Length > 0){
             if (_handItems[1] != null && _selectedSlot.Value != 1)
                 SetSelectedSlotServerRpc(1);
         }
