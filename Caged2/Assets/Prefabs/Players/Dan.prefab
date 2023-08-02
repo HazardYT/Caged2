@@ -1030,6 +1030,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   inventory: {fileID: 3096207833739019675}
+  cam: {fileID: 4938463692139139297}
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!114 &1925133852194156374
 MonoBehaviour:
   m_ObjectHideFlags: 0

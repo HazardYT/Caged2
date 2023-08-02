@@ -29,7 +29,7 @@ public class Inventory : NetworkBehaviour
             if (_handItems[0] != null && _selectedSlot.Value != 0)
                 SetSelectedSlotServerRpc(0);
         }
-        if (UserInput.instance.LeftHandPressed && _handItems.Length > 0){
+        if (UserInput.instance.LeftHandPressed && _handItems.Length > 0){ 
             if (_handItems[1] != null && _selectedSlot.Value != 1)
                 SetSelectedSlotServerRpc(1);
         }
@@ -42,27 +42,29 @@ public class Inventory : NetworkBehaviour
             }
         }
     }
-    public void InteractItem(){
-        if (Physics.Raycast(playerCamera.transform.position, playerCamera.transform.forward, out RaycastHit hit, 5, layerMask))
+    public void InteractItem(RaycastHit hit){
+        for (int i = 0; i < _handItems.Length; i++)
         {
-            if (hit.transform.CompareTag("Item"))
+            if (_handItems[i] != null) continue;
+
+            if (hit.transform.TryGetComponent<NetworkObject>(out NetworkObject networkObject))
             {
-                for (int i = 0; i < _handItems.Length; i++)
-                {
-                    if (_handItems[i] != null) continue;
-
-                    if (hit.transform.TryGetComponent<NetworkObject>(out NetworkObject networkObject))
-                    {
-                        NetworkObjectReference reference = new NetworkObjectReference(networkObject);
-                        StartCoroutine(HandeItemPickup(i, reference));
-                        return;
-                    }
-                    else Debug.LogError("Failed To Get Component [NetworkObject] from Item"); 
-                }
-                Debug.LogError("Your Hands are Full!");
-
+                NetworkObjectReference reference = new NetworkObjectReference(networkObject);
+                StartCoroutine(HandeItemPickup(i, reference));
+                return;
+            }
+            else Debug.LogError("Failed To Get Component [NetworkObject] from Item"); 
+        }
+        Debug.LogError("Your Hands are Full!");
+    }
+    public NetworkObject SearchInventoryForItem(string name){
+        for (int i = 0; i < _handItems.Length; i++)
+        {
+            if (_handItems[i].transform.name == name){
+                return _handItems[i];
             }
         }
+        return null;
     }
     private IEnumerator HandeItemPickup(int slot, NetworkObject networkObject){
         NetworkObjectReference networkObjectReference = new NetworkObjectReference(networkObject);
