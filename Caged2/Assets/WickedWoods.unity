@@ -1253,8 +1253,8 @@ MonoBehaviour:
   neededKey: 0
   _closedRotation: {x: 0, y: 0, z: 0, w: 0}
   _openRotation: {x: 0, y: 0, z: -0.70710677, w: 0.70710677}
-  _doorOpenSpeed: 3
-  _doorCloseSpeed: 3
+  _doorOpenSpeed: 1
+  _doorCloseSpeed: 1
   _isLocked:
     m_InternalValue: 0
   _doorCurrentlyMoving:
