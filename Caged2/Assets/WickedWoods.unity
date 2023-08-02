@@ -1197,15 +1197,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -812605562767774375, guid: 91b41052fc34a1c40ae4708da86b42b7,
         type: 3}
       insertIndex: -1
+      addedObject: {fileID: 1858931511}
+    - targetCorrespondingSourceObject: {fileID: -812605562767774375, guid: 91b41052fc34a1c40ae4708da86b42b7,
+        type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1858931510}
     - targetCorrespondingSourceObject: {fileID: -812605562767774375, guid: 91b41052fc34a1c40ae4708da86b42b7,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1858931509}
-    - targetCorrespondingSourceObject: {fileID: -812605562767774375, guid: 91b41052fc34a1c40ae4708da86b42b7,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1858931511}
     - targetCorrespondingSourceObject: {fileID: -812605562767774375, guid: 91b41052fc34a1c40ae4708da86b42b7,
         type: 3}
       insertIndex: -1

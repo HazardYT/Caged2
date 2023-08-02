@@ -16,6 +16,7 @@ public enum Keys{
 
 public class Door : NetworkBehaviour
 {
+    private NetworkObjectReference networkObjectRef;
     public DoorState doorState = DoorState.Closed;
     public Keys neededKey;
     public Quaternion _closedRotation;
@@ -27,6 +28,7 @@ public class Door : NetworkBehaviour
 
     void Start(){
         _closedRotation = transform.localRotation;
+        networkObjectRef = new NetworkObjectReference(this.GetComponent<NetworkObject>());
     }
     [ServerRpc(RequireOwnership = false)]
     public void ChangeDoorStateServerRpc(){
@@ -42,6 +44,7 @@ public class Door : NetworkBehaviour
                 _doorCurrentlyMoving.Value = true;
                 break;
         }
+        UpdateDoorChangeClientRpc(networkObjectRef, doorState);
     }
     IEnumerator OpenDoor(){
         float elapsedTime = 0f;
@@ -68,5 +71,10 @@ public class Door : NetworkBehaviour
     public void UnlockDoorServerRpc(){
         _isLocked.Value = false;
     }
+    [ClientRpc]
+    public void UpdateDoorChangeClientRpc(NetworkObjectReference networkObjectReference, DoorState state){
+        networkObjectReference.TryGet(out NetworkObject networkObject);
+        networkObject.GetComponent<Door>().doorState = state;
 
+    }
 }
