@@ -29,9 +29,11 @@ public class ItemTransform : NetworkBehaviour
 
     public void OnItemDropped()
     {
+        print("ON ITEM DROPPED CALLED");
         isTracking = false;
         _handTransform = null;
         Slot.OnValueChanged -= OnItemGrabbed;
+        print ("Enabling NETWORK TRANSFORM");
         GetComponent<OwnerNetworkTransform>().enabled = true;
     }
 

@@ -14,7 +14,7 @@ public enum Keys{
     CellarKey,
 }
 
-public class Door : NetworkBehaviour
+public class Door : NetworkBehaviour, IInteractable
 {
     private NetworkObjectReference networkObjectRef;
     public DoorState doorState = DoorState.Closed;
@@ -29,6 +29,12 @@ public class Door : NetworkBehaviour
     void Start(){
         _closedRotation = transform.localRotation;
         networkObjectRef = new NetworkObjectReference(this.GetComponent<NetworkObject>());
+    }
+    public void Interact(RaycastHit hit){
+        if (!_doorCurrentlyMoving.Value && !_isLocked.Value){
+            
+            ChangeDoorStateServerRpc();
+        }
     }
     [ServerRpc(RequireOwnership = false)]
     public void ChangeDoorStateServerRpc(){

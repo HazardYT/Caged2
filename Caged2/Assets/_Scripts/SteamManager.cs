@@ -55,8 +55,7 @@ public class SteamManager : NetworkBehaviour
         await SteamMatchmaking.CreateLobbyAsync(5);
     }
     public async void JoinLobbyWithID(){
-        ulong ID;
-        if (!ulong.TryParse(LobbyIDInput.text , out ID)) 
+        if (!ulong.TryParse(LobbyIDInput.text , out ulong ID)) 
             { return; }
         
         Lobby[] lobbies = await SteamMatchmaking.LobbyList.WithSlotsAvailable(1).RequestAsync();
@@ -70,8 +69,10 @@ public class SteamManager : NetworkBehaviour
         }
     }
     public void CopyID(){
-        TextEditor textEditor = new TextEditor ();
-        textEditor.text = LobbyID.text;
+        TextEditor textEditor = new()
+        {
+            text = LobbyID.text
+        };
         textEditor.SelectAll();
         textEditor.Copy();
     }

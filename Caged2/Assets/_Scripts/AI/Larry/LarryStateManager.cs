@@ -22,30 +22,40 @@ public class LarryStateManager : NetworkBehaviour
     [Header("Variables")]
     public NavMeshAgent agent;
     public Transform _Target;
+    public Transform _currentPOI;
     public Vector3 _walkPointPosition;
+    public Transform[] _POIList;
 
     [Header("Parameters")]
     public Vector2 _wanderSpeedRange;
     public Vector2 _wanderWaitRange;
+    public float _wanderToPOIDelay;
+    public float _hearingDistance;
+    public float _hearingChaseVolume;
     public float _checkRadius;
     public float _wanderDistance;
     public float _chaseRadius;
     public float _attackRadius;
+    public float _minDistanceBetweenWalkPoints;
+    public float _agentChaseSpeed;
     public int _maxWalkPointAttempts;
+    public int _wanderVariationSteps;
+    public LayerMask layerMask;
     [SerializeField] private int _colliderCount;
-    [SerializeField] private LayerMask layerMask;
     [SerializeField] private Collider[] results;
 
     //public override void OnNetworkSpawn()
     void Start()
     {
-        results = new Collider[_colliderCount];
+        //if (!IsServer) return;
+        _isActive = true;
         currentState = WanderState;
         CurrentAIState = State.Wander;
         currentState.EnterState(this);
     }
     void Update(){ 
         //if (!_isActive || !IsServer) return;
+        results = new Collider[_colliderCount];
         Physics.OverlapSphereNonAlloc(transform.position, _checkRadius, results, layerMask);
         currentState.UpdateState(this, results);
     }
@@ -54,8 +64,14 @@ public class LarryStateManager : NetworkBehaviour
         state.EnterState(this);
     }
     void OnDrawGizmosSelected(){
-        Gizmos.color = Color.yellow;
+        Gizmos.color = Color.white;
         Gizmos.DrawWireSphere(transform.position, _checkRadius);
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, _chaseRadius);
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, _attackRadius);
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, _wanderDistance);
     }
 }
 

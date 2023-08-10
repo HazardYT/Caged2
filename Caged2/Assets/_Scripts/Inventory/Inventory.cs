@@ -42,7 +42,7 @@ public class Inventory : NetworkBehaviour
             }
         }
     }
-    public void InteractItem(RaycastHit hit){
+    public void Interact(RaycastHit hit){
         for (int i = 0; i < _handItems.Length; i++)
         {
             if (_handItems[i] != null) continue;
@@ -113,12 +113,14 @@ public class Inventory : NetworkBehaviour
         networkObject.GetComponent<ItemTransform>().isTracking = false;
         if (!networkObject.TryRemoveParent()){
             Debug.LogError("Failed to Drop item Because: TryRemoveParent Failed."); return; }  
+        print("REMOVING PARENT");
         Rigidbody pickUpObjectRigidbody = networkObject.GetComponent<Rigidbody>();
         pickUpObjectRigidbody.isKinematic = false;
         pickUpObjectRigidbody.interpolation = RigidbodyInterpolation.Interpolate;
         NetworkObjectReference playerNetworkObjectReference = new NetworkObjectReference(playerNetworkObject);
-        networkObject.transform.position = Direction + Forward;
         DropSelectedItemClientRpc(playerNetworkObjectReference);
+        print("SETTING OBJECT POSITION AFTER REMOVE PARENT");
+        networkObject.transform.position = Direction + Forward;
     }
     [ServerRpc]
     public void SetSelectedSlotServerRpc(int slot, ServerRpcParams serverRpcParams = default){

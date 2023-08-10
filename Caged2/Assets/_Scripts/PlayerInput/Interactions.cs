@@ -6,11 +6,10 @@ public class Interactions : NetworkBehaviour
     [SerializeField] private Inventory inventory;
     [SerializeField] private Camera cam;
     [SerializeField] private LayerMask layerMask;
-    private GameManager _gameManager;
     public override void OnNetworkSpawn()
     {
-        _gameManager = FindObjectOfType<GameManager>();
-        if (IsHost){
+        GameManager _gameManager = FindObjectOfType<GameManager>();
+        if (IsServer){
             _gameManager.ToggleTimer();
         }
     }
@@ -20,17 +19,13 @@ public class Interactions : NetworkBehaviour
         if (UserInput.instance.InteractPressed){
             if (Physics.Raycast(cam.transform.position, cam.transform.forward, out RaycastHit hit, 5, layerMask)){
                 if (hit.transform.CompareTag("Item")){
-                    inventory.InteractItem(hit);
+                    inventory.Interact(hit);
+                    return;
                 }
-                if (hit.transform.CompareTag("Door")){
-                    Door door = hit.transform.GetComponent<Door>();
-                    if (!door._doorCurrentlyMoving.Value && !door._isLocked.Value){
-                        door.ChangeDoorStateServerRpc();
-                    }
-                    if (door._isLocked.Value){
-                        if (inventory.SearchInventoryForItem(door.neededKey.ToString()))
-                        door.UnlockDoorServerRpc();
-                    }
+                else{
+                    var interaction = hit.transform.GetComponent<IInteractable>();
+                    if (interaction == null) return;
+                    interaction.Interact(hit);
                 }
             }
         }
