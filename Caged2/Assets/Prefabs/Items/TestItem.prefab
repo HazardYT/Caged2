@@ -15,8 +15,8 @@ GameObject:
   - component: {fileID: 4089596165285849845}
   - component: {fileID: -784952540163904853}
   - component: {fileID: 1436708779957475010}
-  - component: {fileID: -8099385868224802957}
-  - component: {fileID: 5097402221929219500}
+  - component: {fileID: 5752763117783864790}
+  - component: {fileID: 846936742773391732}
   m_Layer: 6
   m_Name: TestItem
   m_TagString: Item
@@ -37,7 +37,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &6096598086159864212
 MeshRenderer:
@@ -152,6 +152,8 @@ MonoBehaviour:
   _handTransform: {fileID: 0}
   Slot:
     m_InternalValue: -1
+  networkTransform: {fileID: 5752763117783864790}
+  isTracking: 0
 --- !u!114 &1436708779957475010
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -172,7 +174,7 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &-8099385868224802957
+--- !u!114 &5752763117783864790
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -181,7 +183,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3664365523776723371}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b8072ff50726f54db065e9591e5eebe, type: 3}
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   SyncPositionX: 1
@@ -202,7 +204,7 @@ MonoBehaviour:
   InLocalSpace: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &5097402221929219500
+--- !u!114 &846936742773391732
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

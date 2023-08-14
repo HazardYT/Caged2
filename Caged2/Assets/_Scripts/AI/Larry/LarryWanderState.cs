@@ -21,7 +21,7 @@ public class LarryWanderState : LarryBaseState
         foreach(Collider collider in results){
             if (collider == null) continue;
             if (Physics.Raycast(manager.transform.position, collider.transform.position - manager.transform.position, out RaycastHit hit, manager._checkRadius, manager.layerMask)){
-                if (collider.CompareTag("Player")){
+                if (hit.transform.CompareTag("Player")){
                     if (Vector3.Distance(manager.transform.position, collider.transform.position) <= manager._chaseRadius){
                         manager._Target = collider.transform;
                         manager.SwitchState(manager.ChaseState);
@@ -32,7 +32,7 @@ public class LarryWanderState : LarryBaseState
     }
     private void ListenForSounds(LarryStateManager manager)
     {
-        AudioSource[] audioSources = MonoBehaviour.FindObjectsOfType<AudioSource>();
+        AudioSource[] audioSources = Object.FindObjectsOfType<AudioSource>();
         foreach (AudioSource source in audioSources)
         {
             if (source.isPlaying)
@@ -90,12 +90,11 @@ public class LarryWanderState : LarryBaseState
     void SearchForWalkPoint(LarryStateManager manager)
     {
         int attempts = 0;
-        Vector3 previousPosition = manager._walkPointPosition; // Store the previous position
         do
         {
             attempts++;
 
-            float stepLength = Random.Range(manager._wanderDistance /2 , manager._wanderDistance); // Random step length within _walkpointDistance
+            float stepLength = Random.Range(manager._wanderDistance / 2, manager._wanderDistance);
 
             Vector2 randomDirection = Random.insideUnitCircle.normalized * stepLength;
 
@@ -103,18 +102,8 @@ public class LarryWanderState : LarryBaseState
 
             NavMesh.SamplePosition(nextPosition, out NavMeshHit hit, manager._wanderDistance, NavMesh.AllAreas);
 
-            NavMeshPath path = new NavMeshPath();
-            manager.agent.CalculatePath(hit.position, path);
-
-            if (path.status == NavMeshPathStatus.PathComplete)
-            {
-                if (Vector3.Distance(hit.position, previousPosition) >= manager._minDistanceBetweenWalkPoints)
-                {
-                    manager._walkPointPosition = hit.position;
-                    manager._walkPointSet = true;
-                    return;
-                }
-            }
+            manager._walkPointPosition = hit.position;
+            manager._walkPointSet = true;
 
         } while (attempts < manager._maxWalkPointAttempts);
 

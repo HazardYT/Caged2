@@ -1,10 +1,11 @@
-using UnityEngine;
+using Unity.Netcode.Components;
 using Unity.Netcode;
-
+using UnityEngine;
 public class ItemTransform : NetworkBehaviour
 {
     public Transform _handTransform;
-    public NetworkVariable<int> Slot = new NetworkVariable<int>(-1, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public NetworkVariable<int> Slot = new(-1);
+    public NetworkTransform networkTransform;
     public bool isTracking = false;
     public override void OnNetworkObjectParentChanged(NetworkObject parentNetworkObject)
     {
@@ -12,7 +13,7 @@ public class ItemTransform : NetworkBehaviour
         {
             Slot.OnValueChanged += OnItemGrabbed;
         }
-        else
+        else if (parentNetworkObject == null)
         {
             OnItemDropped();
             return;
@@ -24,7 +25,7 @@ public class ItemTransform : NetworkBehaviour
         isTracking = true;
         Inventory inventory = transform.parent.GetComponent<Inventory>();
         _handTransform = inventory._handTransforms[newValue];
-        GetComponent<OwnerNetworkTransform>().enabled = false;
+        networkTransform.enabled = false;
     }
 
     public void OnItemDropped()
@@ -34,18 +35,13 @@ public class ItemTransform : NetworkBehaviour
         _handTransform = null;
         Slot.OnValueChanged -= OnItemGrabbed;
         print ("Enabling NETWORK TRANSFORM");
-        GetComponent<OwnerNetworkTransform>().enabled = true;
+        networkTransform.enabled = true;
     }
 
     private void Update()
     {
         if (!isTracking) return;
-        UpdateTransforms();
+        transform.SetPositionAndRotation(_handTransform.position, _handTransform.rotation);
     }
 
-    private void UpdateTransforms()
-    {
-        transform.position = _handTransform.position;
-        transform.rotation = _handTransform.rotation;
-    }
 }

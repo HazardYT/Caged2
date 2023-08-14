@@ -1,7 +1,6 @@
 using UnityEngine;
 using Unity.Netcode;
 using UnityEngine.AI;
-using System;
 
 public enum State{
     Wander,
@@ -36,7 +35,6 @@ public class LarryStateManager : NetworkBehaviour
     public float _wanderDistance;
     public float _chaseRadius;
     public float _attackRadius;
-    public float _minDistanceBetweenWalkPoints;
     public float _agentChaseSpeed;
     public int _maxWalkPointAttempts;
     public int _wanderVariationSteps;

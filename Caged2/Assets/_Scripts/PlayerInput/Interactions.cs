@@ -23,8 +23,7 @@ public class Interactions : NetworkBehaviour
                     return;
                 }
                 else{
-                    var interaction = hit.transform.GetComponent<IInteractable>();
-                    if (interaction == null) return;
+                    if (!hit.transform.TryGetComponent<IInteractable>(out var interaction)) return;
                     interaction.Interact(hit);
                 }
             }

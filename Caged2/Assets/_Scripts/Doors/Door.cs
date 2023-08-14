@@ -23,12 +23,12 @@ public class Door : NetworkBehaviour, IInteractable
     public Quaternion _openRotation;
     public float _doorOpenSpeed;
     public float _doorCloseSpeed;
-    public NetworkVariable<bool> _isLocked = new NetworkVariable<bool>();
-    public NetworkVariable<bool> _doorCurrentlyMoving = new NetworkVariable<bool>(false);
+    public NetworkVariable<bool> _isLocked = new();
+    public NetworkVariable<bool> _doorCurrentlyMoving = new(false);
 
     void Start(){
         _closedRotation = transform.localRotation;
-        networkObjectRef = new NetworkObjectReference(this.GetComponent<NetworkObject>());
+        networkObjectRef = new NetworkObjectReference(GetComponent<NetworkObject>());
     }
     public void Interact(RaycastHit hit){
         if (!_doorCurrentlyMoving.Value && !_isLocked.Value){
@@ -57,7 +57,7 @@ public class Door : NetworkBehaviour, IInteractable
         while (elapsedTime < _doorOpenSpeed)
         {
             transform.localRotation = Quaternion.Slerp(_closedRotation, _openRotation, elapsedTime / _doorOpenSpeed);
-            elapsedTime += Time.fixedDeltaTime;
+            elapsedTime += Time.deltaTime;
             yield return null;
         }
         yield return new WaitForEndOfFrame();
@@ -67,7 +67,7 @@ public class Door : NetworkBehaviour, IInteractable
         float elapsedTime = 0f;
         while (elapsedTime < _doorCloseSpeed){
             transform.localRotation = Quaternion.Slerp(_openRotation, _closedRotation, elapsedTime / _doorCloseSpeed);
-            elapsedTime += Time.fixedDeltaTime;
+            elapsedTime += Time.deltaTime;
             yield return null;
         }
         yield return new WaitForEndOfFrame();

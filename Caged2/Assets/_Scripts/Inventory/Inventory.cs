@@ -9,16 +9,11 @@ public class Inventory : NetworkBehaviour
     public Transform[] _handTransforms;
     public NetworkObject[] _handItems;
     [Header("Variables")]
-    private NetworkObjectReference playerNetworkObjectReference;
+
     public CinemachineVirtualCamera playerCamera;
     [SerializeField] private LayerMask layerMask;
-    [SerializeField] public NetworkVariable<int> _selectedSlot = new NetworkVariable<int>(-1);
-    public override void OnNetworkSpawn()
-    {
-        if (IsOwner && IsLocalPlayer){
-            playerNetworkObjectReference = new NetworkObjectReference(GetComponent<NetworkObject>());
-        }
-    }
+    public NetworkVariable<int> _selectedSlot = new(-1);
+
     private void Update(){
         if (!IsOwner && IsLocalPlayer) return;
         HandleInput();
@@ -47,9 +42,9 @@ public class Inventory : NetworkBehaviour
         {
             if (_handItems[i] != null) continue;
 
-            if (hit.transform.TryGetComponent<NetworkObject>(out NetworkObject networkObject))
+            if (hit.transform.TryGetComponent(out NetworkObject networkObject))
             {
-                NetworkObjectReference reference = new NetworkObjectReference(networkObject);
+                NetworkObjectReference reference = new(networkObject);
                 StartCoroutine(HandeItemPickup(i, reference));
                 return;
             }
@@ -67,7 +62,7 @@ public class Inventory : NetworkBehaviour
         return null;
     }
     private IEnumerator HandeItemPickup(int slot, NetworkObject networkObject){
-        NetworkObjectReference networkObjectReference = new NetworkObjectReference(networkObject);
+        NetworkObjectReference networkObjectReference = new(networkObject);
         PickupItemServerRpc(networkObjectReference, slot);
         yield return new WaitForEndOfFrame();
         SetSelectedSlotServerRpc(slot);
@@ -82,13 +77,12 @@ public class Inventory : NetworkBehaviour
     [ServerRpc]
     public void PickupItemServerRpc(NetworkObjectReference networkObjectReference, int slot, ServerRpcParams serverRpcParams = default){
         NetworkObject playerNetworkObject = NetworkManager.Singleton.ConnectedClients[serverRpcParams.Receive.SenderClientId].PlayerObject;
-        Inventory inventory = playerNetworkObject.GetComponent<Inventory>();
 
         if (!networkObjectReference.TryGet(out NetworkObject networkObject)) { Debug.LogError("Failed to Get Item NetworkObject: TryGet from NetworkObjectReference Failed."); return; }
 
         if (!networkObject.TrySetParent(transform, false)) { Debug.LogError("Failed to Parent Item: TrySetParent Failed."); return; }
 
-        NetworkObjectReference playerReference = new NetworkObjectReference(playerNetworkObject);
+        NetworkObjectReference playerReference = new(playerNetworkObject);
         UpdateClientsOnItemChangeClientRpc(playerReference, networkObjectReference, slot);
         Rigidbody pickUpObjectRigidbody = networkObject.GetComponent<Rigidbody>();
         pickUpObjectRigidbody.isKinematic = true;
@@ -107,20 +101,20 @@ public class Inventory : NetworkBehaviour
     }
     [ServerRpc]
     public void ThrowItemServerRpc(Vector3 Direction, Vector3 Forward, ServerRpcParams rpcParams = default){
+        Vector3 position = Direction + Forward;
         NetworkObject playerNetworkObject = NetworkManager.ConnectedClients[rpcParams.Receive.SenderClientId].PlayerObject;
         Inventory inventory = playerNetworkObject.GetComponent<Inventory>();
         NetworkObject networkObject = inventory._handItems[inventory._selectedSlot.Value].GetComponent<NetworkObject>();
-        networkObject.GetComponent<ItemTransform>().isTracking = false;
         if (!networkObject.TryRemoveParent()){
             Debug.LogError("Failed to Drop item Because: TryRemoveParent Failed."); return; }  
         print("REMOVING PARENT");
         Rigidbody pickUpObjectRigidbody = networkObject.GetComponent<Rigidbody>();
         pickUpObjectRigidbody.isKinematic = false;
         pickUpObjectRigidbody.interpolation = RigidbodyInterpolation.Interpolate;
-        NetworkObjectReference playerNetworkObjectReference = new NetworkObjectReference(playerNetworkObject);
+        NetworkObjectReference playerNetworkObjectReference = new(playerNetworkObject);
         DropSelectedItemClientRpc(playerNetworkObjectReference);
+        networkObject.transform.SetPositionAndRotation(position, Quaternion.identity);
         print("SETTING OBJECT POSITION AFTER REMOVE PARENT");
-        networkObject.transform.position = Direction + Forward;
     }
     [ServerRpc]
     public void SetSelectedSlotServerRpc(int slot, ServerRpcParams serverRpcParams = default){

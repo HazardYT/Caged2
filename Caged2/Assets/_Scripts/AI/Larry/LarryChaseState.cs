@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class LarryChaseState : LarryBaseState
 {
-    bool exitState;
-
     public override void EnterState(LarryStateManager manager){
         manager.CurrentAIState = State.Chase;
         manager.agent.speed = manager._agentChaseSpeed;
