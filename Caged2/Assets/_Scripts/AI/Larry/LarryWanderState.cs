@@ -101,9 +101,10 @@ public class LarryWanderState : LarryBaseState
             Vector3 nextPosition = manager.transform.position + new Vector3(randomDirection.x, 0f, randomDirection.y);
 
             NavMesh.SamplePosition(nextPosition, out NavMeshHit hit, manager._wanderDistance, NavMesh.AllAreas);
-
+            if (manager.agent.pathStatus == NavMeshPathStatus.PathComplete){
             manager._walkPointPosition = hit.position;
             manager._walkPointSet = true;
+            }
 
         } while (attempts < manager._maxWalkPointAttempts);
 
