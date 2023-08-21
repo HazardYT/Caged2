@@ -2,9 +2,6 @@ using UnityEngine;
 
 public class ProceduralHandAnimation : MonoBehaviour
 {
-    [SerializeField] private Transform _leftHand;
-    [SerializeField] private Transform _rightHand;
-
     [SerializeField] private Transform _leftHandTarget;
     [SerializeField] private Transform _rightHandTarget;
     [SerializeField] private Transform[] _handOverlapPositions;
@@ -15,6 +12,7 @@ public class ProceduralHandAnimation : MonoBehaviour
     [SerializeField] private float _armRotationSpeed;
     [SerializeField] private float _fingerBendSpeed;
     [SerializeField] private float _checkDistance;
+    [SerializeField] private float _handOffset;
 
     // Store the original positions and rotations of the hand targets
     private Vector3 _originalLeftPosition;
@@ -31,54 +29,51 @@ public class ProceduralHandAnimation : MonoBehaviour
         _originalRightRotation = _rightHandTarget.localRotation;
     }
 
-    void Update()
+    void LateUpdate()
     {
-        HandleHand(_leftHand, _leftHandTarget, _handOverlapPositions[0].position);
-        HandleHand(_rightHand, _rightHandTarget, _handOverlapPositions[1].position);
+        HandleHand(_leftHandTarget, _handOverlapPositions[0].position);
+        HandleHand(_rightHandTarget, _handOverlapPositions[1].position);
     }
 
-    void HandleHand(Transform hand, Transform target, Vector3 location)
+void HandleHand(Transform target, Vector3 location)
+{
+    Collider[] hitColliders = new Collider[1];
+    int numColliders = Physics.OverlapSphereNonAlloc(location, _checkDistance, hitColliders, _wallLayerMask);
+    if (numColliders > 0)
     {
-        Collider[] hitColliders = new Collider[1];
-        int numColliders = Physics.OverlapSphereNonAlloc(location, _checkDistance, hitColliders, _wallLayerMask);
-
-        if (numColliders > 0)
-        {
-            Collider hitCollider = hitColliders[0];
-
-            if (Physics.Raycast(location, hitCollider.transform.position - location, out RaycastHit hit, _wallLayerMask))
-            {
-                Debug.DrawLine(hand.position, hit.point, Color.red);
-                UpdateHandTarget(hand, target, hit);
-            }
-        }
-        else
-        {
-            // No collider found, move the target back to the original position and rotation
-            MoveHandTargetToOriginal(target);
+        Collider hitCollider = hitColliders[0];
+        Vector3 raycastDirection = hitCollider.ClosestPoint(location) - location;
+        if (Physics.Raycast(location, raycastDirection, out RaycastHit hit, _checkDistance, _wallLayerMask))
+        {   
+            Debug.DrawLine(target.position, hit.point, Color.red);
+            UpdateHandTarget(target, hit);
         }
     }
-    void UpdateHandTarget(Transform hand, Transform target, RaycastHit hit)
+    else MoveHandTargetToOriginal(target); // No collider found, move the target back to the original position and rotation
+
+}
+
+    void UpdateHandTarget(Transform target, RaycastHit hit)
     {
-        Quaternion rotation = Quaternion.LookRotation(-hit.normal , hand.up);
+        Quaternion rotation = Quaternion.LookRotation(-hit.normal, target.up);
+        Quaternion crookedCorrection = Quaternion.Euler(0f, _leftHandTarget == target ? -30f : 30f, 0f);
+        rotation *= crookedCorrection;
 
-        target.SetPositionAndRotation(Vector3.Lerp(target.position, hit.point, _armMoveSpeed * Time.deltaTime),
-            Quaternion.Lerp(target.rotation, rotation, _armRotationSpeed * Time.deltaTime));
+         // Apply a small offset along the hit normal to prevent clipping through the surface
+        Vector3 offsetPosition = hit.point + hit.normal * _handOffset;
 
-        Transform[] whatFinger = _leftHandTarget == target ? _leftFingers : _rightFingers;
-        foreach (Transform finger in whatFinger)
+        target.SetPositionAndRotation(Vector3.Lerp(target.position, offsetPosition, _armMoveSpeed * Time.deltaTime), 
+        Quaternion.Lerp(target.rotation, rotation, 1 * _armRotationSpeed * Time.deltaTime));
+
+        foreach (Transform finger in _leftHandTarget == target ? _leftFingers : _rightFingers)
         {
-
-            if (Physics.Raycast(finger.position, hit.point, out RaycastHit fingerHit, _checkDistance, _wallLayerMask))
+            Vector3 raycastDirection = hit.collider.ClosestPoint(hit.point) - hit.point;
+            if (Physics.Raycast(finger.position, raycastDirection * _handOffset, out RaycastHit fingerHit, _wallLayerMask))
             {
-                Quaternion fingerRotation = Quaternion.LookRotation(-fingerHit.normal.normalized + fingerHit.point, finger.up);
-                finger.rotation = Quaternion.Lerp(finger.rotation, fingerRotation, _fingerBendSpeed * Time.deltaTime);
+                Quaternion fingerRotation = Quaternion.LookRotation(_leftHandTarget == target? fingerHit.normal : -fingerHit.normal, finger.up);
+                finger.rotation = Quaternion.Lerp(finger.rotation, fingerRotation, 1 * _fingerBendSpeed * Time.deltaTime);
             }
-            else
-            {
-                // Reset finger rotation when no hit is detected
-                finger.localRotation = Quaternion.identity;
-            }
+            else finger.localRotation = Quaternion.identity; // Reset finger rotation when no hit is detected 
         }
     }
 
@@ -89,12 +84,12 @@ public class ProceduralHandAnimation : MonoBehaviour
         if (target == _leftHandTarget && target.localPosition != _originalLeftPosition)
         {
             target.SetLocalPositionAndRotation(Vector3.Lerp(target.localPosition, _originalLeftPosition, _armMoveSpeed * Time.deltaTime), 
-            Quaternion.Lerp(target.localRotation, _originalLeftRotation, _armRotationSpeed * Time.deltaTime));
+            Quaternion.Lerp(target.localRotation, _originalLeftRotation, 1 * _armRotationSpeed * Time.deltaTime));
         }
         else if (target == _rightHandTarget && target.localPosition != _originalRightPosition)
         {
             target.SetLocalPositionAndRotation(Vector3.Lerp(target.localPosition, _originalRightPosition, _armMoveSpeed * Time.deltaTime), 
-            Quaternion.Lerp(target.localRotation, _originalRightRotation, _armRotationSpeed * Time.deltaTime));
+            Quaternion.Lerp(target.localRotation, _originalRightRotation, 1 * _armRotationSpeed * Time.deltaTime));
         }
     }
 
