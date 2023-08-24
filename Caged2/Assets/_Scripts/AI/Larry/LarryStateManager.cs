@@ -22,6 +22,7 @@ public class LarryStateManager : NetworkBehaviour
     public NavMeshAgent agent;
     public Transform _Target;
     public Transform _currentPOI;
+    public Animator anim;
     public Vector3 _walkPointPosition;
     public Transform[] _POIList;
 

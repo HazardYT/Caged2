@@ -35,45 +35,57 @@ public class ProceduralHandAnimation : MonoBehaviour
         HandleHand(_rightHandTarget, _handOverlapPositions[1].position);
     }
 
-void HandleHand(Transform target, Vector3 location)
-{
-    Collider[] hitColliders = new Collider[1];
-    int numColliders = Physics.OverlapSphereNonAlloc(location, _checkDistance, hitColliders, _wallLayerMask);
-    if (numColliders > 0)
+    void HandleHand(Transform target, Vector3 location)
     {
-        Collider hitCollider = hitColliders[0];
-        Vector3 raycastDirection = hitCollider.ClosestPoint(location) - location;
-        if (Physics.Raycast(location, raycastDirection, out RaycastHit hit, _checkDistance, _wallLayerMask))
-        {   
-            Debug.DrawLine(target.position, hit.point, Color.red);
-            UpdateHandTarget(target, hit);
+        Collider[] hitColliders = new Collider[1];
+        int numColliders = Physics.OverlapSphereNonAlloc(location, _checkDistance, hitColliders, _wallLayerMask);
+        if (numColliders > 0)
+        {
+            Collider hitCollider = hitColliders[0];
+            Vector3 raycastDirection = hitCollider.ClosestPoint(location) - location;
+            if (Physics.Raycast(location, raycastDirection, out RaycastHit hit, _checkDistance, _wallLayerMask))
+            {   
+                Debug.DrawLine(target.position, hit.point, Color.red);
+                UpdateHandTarget(target, hit);
+            }
         }
-    }
-    else MoveHandTargetToOriginal(target); // No collider found, move the target back to the original position and rotation
+        else MoveHandTargetToOriginal(target); // No collider found, move the target back to the original position and rotation
 
-}
+    }
 
     void UpdateHandTarget(Transform target, RaycastHit hit)
     {
-        Quaternion rotation = Quaternion.LookRotation(-hit.normal, target.up);
-        Quaternion crookedCorrection = Quaternion.Euler(0f, _leftHandTarget == target ? -30f : 30f, 0f);
+        // Calculate the rotation to face opposite direction of the hit normal
+        Quaternion rotation = Quaternion.LookRotation(-hit.normal, -transform.up);
+
+        // Apply crooked correction
+        Quaternion crookedCorrection = Quaternion.Euler(0f, _leftHandTarget == target ? -90f : 90f, 0f);
         rotation *= crookedCorrection;
 
-         // Apply a small offset along the hit normal to prevent clipping through the surface
+
+        // Apply a small offset along the hit normal to prevent clipping through the surface
         Vector3 offsetPosition = hit.point + hit.normal * _handOffset;
 
-        target.SetPositionAndRotation(Vector3.Lerp(target.position, offsetPosition, _armMoveSpeed * Time.deltaTime), 
-        Quaternion.Lerp(target.rotation, rotation, 1 * _armRotationSpeed * Time.deltaTime));
-
-        foreach (Transform finger in _leftHandTarget == target ? _leftFingers : _rightFingers)
+        // Set the position and rotation of the target
+        target.SetPositionAndRotation(
+            Vector3.Lerp(target.position, offsetPosition, _armMoveSpeed * Time.deltaTime), 
+            Quaternion.Lerp(target.rotation, rotation, _armRotationSpeed * Time.deltaTime)
+        );
+            
+        Transform[] whatFinger = _leftHandTarget == target ? _leftFingers : _rightFingers;
+        foreach (Transform finger in whatFinger)
         {
-            Vector3 raycastDirection = hit.collider.ClosestPoint(hit.point) - hit.point;
-            if (Physics.Raycast(finger.position, raycastDirection * _handOffset, out RaycastHit fingerHit, _wallLayerMask))
+
+            if (Physics.Raycast(finger.position, hit.point, out RaycastHit fingerHit, _checkDistance, _wallLayerMask))
             {
-                Quaternion fingerRotation = Quaternion.LookRotation(_leftHandTarget == target? fingerHit.normal : -fingerHit.normal, finger.up);
-                finger.rotation = Quaternion.Lerp(finger.rotation, fingerRotation, 1 * _fingerBendSpeed * Time.deltaTime);
+                Quaternion fingerRotation = Quaternion.LookRotation(-fingerHit.normal, transform.up);
+                finger.rotation = Quaternion.Lerp(finger.rotation, fingerRotation, _fingerBendSpeed * Time.deltaTime);
             }
-            else finger.localRotation = Quaternion.identity; // Reset finger rotation when no hit is detected 
+            else
+            {
+                // Reset finger rotation when no hit is detected
+                finger.localRotation = Quaternion.identity;
+            }
         }
     }
 
