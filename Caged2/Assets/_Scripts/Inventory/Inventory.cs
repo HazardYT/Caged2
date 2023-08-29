@@ -100,21 +100,28 @@ public class Inventory : NetworkBehaviour
         inv._handItems[slot] = networkObject;
     }
     [ServerRpc]
-    public void ThrowItemServerRpc(Vector3 Direction, Vector3 Forward, ServerRpcParams rpcParams = default){
+    public void ThrowItemServerRpc(Vector3 Direction, Vector3 Forward, ServerRpcParams rpcParams = default)
+    {
         Vector3 position = Direction + Forward;
         NetworkObject playerNetworkObject = NetworkManager.ConnectedClients[rpcParams.Receive.SenderClientId].PlayerObject;
         Inventory inventory = playerNetworkObject.GetComponent<Inventory>();
         NetworkObject networkObject = inventory._handItems[inventory._selectedSlot.Value].GetComponent<NetworkObject>();
-        if (!networkObject.TryRemoveParent()){
-            Debug.LogError("Failed to Drop item Because: TryRemoveParent Failed."); return; }  
-        print("REMOVING PARENT");
+        if (!networkObject.TryRemoveParent())
+        {
+            Debug.LogError("Failed to Drop item Because: TryRemoveParent Failed.");
+            return;
+        }
+
         Rigidbody pickUpObjectRigidbody = networkObject.GetComponent<Rigidbody>();
         pickUpObjectRigidbody.isKinematic = false;
         pickUpObjectRigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+
         NetworkObjectReference playerNetworkObjectReference = new(playerNetworkObject);
         DropSelectedItemClientRpc(playerNetworkObjectReference);
-        networkObject.transform.SetPositionAndRotation(position, Quaternion.identity);
-        print("SETTING OBJECT POSITION AFTER REMOVE PARENT");
+
+        // Set the position of the item immediately after removing the parent
+        networkObject.transform.position = position;
+        networkObject.transform.rotation = Quaternion.identity;
     }
     [ServerRpc]
     public void SetSelectedSlotServerRpc(int slot, ServerRpcParams serverRpcParams = default){
