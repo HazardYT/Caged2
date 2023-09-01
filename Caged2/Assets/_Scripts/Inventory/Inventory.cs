@@ -67,7 +67,7 @@ public class Inventory : NetworkBehaviour
 
         NetworkObject spawnedObjectNetworkObject = spawnedObject.GetComponent<NetworkObject>();
 
-        spawnedObjectNetworkObject.SpawnWithOwnership(serverRpcParams.Receive.SenderClientId);
+        spawnedObjectNetworkObject.Spawn();
 
         spawnedObjectNetworkObject.TrySetParent(playerNetworkObject.transform);
 
@@ -88,7 +88,7 @@ public class Inventory : NetworkBehaviour
         {
             ConstraintSource constraintSource = new()
             {
-                sourceTransform = inventory.handTracking[slot].transform,
+                sourceTransform = inventory.inventoryPositions[slot],
                 weight = 1
             };
             parentConstraint.AddSource(constraintSource);
