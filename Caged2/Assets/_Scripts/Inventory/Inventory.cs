@@ -2,6 +2,7 @@ using System.Collections;
 using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Animations;
 
 public class Inventory : NetworkBehaviour
 {
@@ -14,27 +15,6 @@ public class Inventory : NetworkBehaviour
     private void Update(){
         if (!IsOwner && IsLocalPlayer) return;
         HandleInput();
-        HandleTracking();
-    }
-    private void HandleTracking(){
-        for (int i = 0; i < inventorySlots.Length; i++)
-        {
-            if (inventorySlots[i] != null){
-                if (IsServer){
-                    inventorySlots[i].SetPositionAndRotation(handTracking[i].position, handTracking[i].rotation);
-                }
-                else{
-                    NetworkObjectReference networkObjectReference = new(inventorySlots[i].GetComponent<NetworkObject>());
-                    HandleTrackingClientRpc(networkObjectReference, handTracking[i].position, handTracking[i].rotation);
-                }
-            }
-            
-        }
-    }
-    [ClientRpc]
-    public void HandleTrackingClientRpc(NetworkObjectReference reference, Vector3 position, Quaternion rotation){
-        reference.TryGet(out NetworkObject networkObject);
-        networkObject.transform.SetPositionAndRotation(position, rotation);
     }
     private void HandleInput()
     {
@@ -81,22 +61,38 @@ public class Inventory : NetworkBehaviour
 
         networkObjectReference.TryGet(out NetworkObject networkObject);
 
-        Transform playerTransform = NetworkManager.Singleton.ConnectedClients[serverRpcParams.Receive.SenderClientId].PlayerObject.transform;
+        NetworkObject playerNetworkObject = NetworkManager.Singleton.ConnectedClients[serverRpcParams.Receive.SenderClientId].PlayerObject;
         
-        GameObject spawnedObject = Instantiate(networkObject.gameObject, playerTransform.GetComponent<Inventory>().inventoryPositions[slot].position, quaternion.identity);
+        GameObject spawnedObject = Instantiate(networkObject.gameObject, playerNetworkObject.GetComponent<Inventory>().inventoryPositions[slot].position, quaternion.identity);
 
         NetworkObject spawnedObjectNetworkObject = spawnedObject.GetComponent<NetworkObject>();
 
         spawnedObjectNetworkObject.SpawnWithOwnership(serverRpcParams.Receive.SenderClientId);
 
-        spawnedObjectNetworkObject.TrySetParent(playerTransform);
-
-        playerTransform.GetComponent<Inventory>().inventorySlots[slot] = spawnedObject.transform;
+        spawnedObjectNetworkObject.TrySetParent(playerNetworkObject.transform);
 
         networkObject.Despawn();
 
+        NetworkObjectReference playerReference = new(playerNetworkObject);
+        NetworkObjectReference objectReference = new(spawnedObjectNetworkObject);
 
-
+        PickupItemClientRpc(playerReference, objectReference, slot);
+    }
+    [ClientRpc]
+    public void PickupItemClientRpc(NetworkObjectReference playerReference, NetworkObjectReference objectReference, int slot){
+        objectReference.TryGet(out NetworkObject networkObject);
+        playerReference.TryGet(out NetworkObject networkPlayer);
+        Inventory inventory = networkPlayer.GetComponent<Inventory>();
+        inventory.inventorySlots[slot] = networkObject.transform;
+        if (networkObject.TryGetComponent(out ParentConstraint parentConstraint))
+        {
+            ConstraintSource constraintSource = new()
+            {
+                sourceTransform = inventory.handTracking[slot].transform,
+                weight = 1
+            };
+            parentConstraint.AddSource(constraintSource);
+        }   
     }
     
     
