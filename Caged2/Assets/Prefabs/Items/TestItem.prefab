@@ -14,8 +14,8 @@ GameObject:
   - component: {fileID: 8338876880124070572}
   - component: {fileID: 4089596165285849845}
   - component: {fileID: 1436708779957475010}
-  - component: {fileID: 6259898158501826655}
-  - component: {fileID: 3119405477533861854}
+  - component: {fileID: 9222765907532474696}
+  - component: {fileID: 2691149148988449391}
   m_Layer: 6
   m_Name: TestItem
   m_TagString: Item
@@ -156,16 +156,16 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &6259898158501826655
+--- !u!114 &9222765907532474696
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3664365523776723371}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b8072ff50726f54db065e9591e5eebe, type: 3}
+  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   SyncPositionX: 1
@@ -184,9 +184,9 @@ MonoBehaviour:
   UseQuaternionCompression: 0
   UseHalfFloatPrecision: 0
   InLocalSpace: 0
-  Interpolate: 1
+  Interpolate: 0
   SlerpPosition: 0
---- !u!114 &3119405477533861854
+--- !u!114 &2691149148988449391
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

@@ -20,13 +20,13 @@ public class Inventory : NetworkBehaviour
         for (int i = 0; i < inventorySlots.Length; i++)
         {
             if (inventorySlots[i] != null){
-                //if (IsServer){
+                if (IsServer){
                     inventorySlots[i].SetPositionAndRotation(handTracking[i].position, handTracking[i].rotation);
-                //}
-                //else{
-                    //NetworkObjectReference networkObjectReference = new(inventorySlots[i].GetComponent<NetworkObject>());
-                  //  HandleTrackingClientRpc(networkObjectReference, handTracking[i].position, handTracking[i].rotation);
-                //}
+                }
+                else{
+                    NetworkObjectReference networkObjectReference = new(inventorySlots[i].GetComponent<NetworkObject>());
+                    HandleTrackingClientRpc(networkObjectReference, handTracking[i].position, handTracking[i].rotation);
+                }
             }
             
         }
