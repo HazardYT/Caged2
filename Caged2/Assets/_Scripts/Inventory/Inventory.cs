@@ -1,18 +1,126 @@
 using System.Collections;
+using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
-using Cinemachine;
 
 public class Inventory : NetworkBehaviour
 {
-    [Header("Slots")]
+    [SerializeField] private bool allowTwoSlots;
+    [SerializeField] private Transform[] inventorySlots;
+    [SerializeField] private Transform[] inventoryPositions;
+    [SerializeField] private Transform[] handTracking;
+    private NetworkVariable<int> selectedSlot = new(0);
+
+    private void Update(){
+        if (!IsOwner && IsLocalPlayer) return;
+        HandleInput();
+        HandleTracking();
+    }
+    private void HandleTracking(){
+        for (int i = 0; i < inventorySlots.Length; i++)
+        {
+            if (inventorySlots[i] != null){
+                inventorySlots[i].position = handTracking[i].position;
+                inventorySlots[i].rotation = handTracking[i].rotation;
+            }
+        }
+    }
+    private void HandleInput()
+    {
+        if (UserInput.instance.RightHandPressed){
+            if (inventorySlots[0] != null && selectedSlot.Value != 0){
+
+            }
+
+        }
+        if (UserInput.instance.LeftHandPressed && inventorySlots.Length > 0){ 
+            if (inventorySlots[1] != null && selectedSlot.Value != 1){
+
+            }
+
+        }
+        if (UserInput.instance.DropPressed){
+            if (inventorySlots[selectedSlot.Value] != null){
+
+            }
+        }
+        if (UserInput.instance.ThrowHeld){
+            
+        }
+        if (UserInput.instance.ThrowReleased){
+        }
+    }
+    public void Interact(RaycastHit hit){
+        for (int i = 0; i < inventorySlots.Length; i++)
+        {
+            if (inventorySlots[i] != null) continue;
+
+            if (hit.transform.TryGetComponent(out NetworkObject networkObject))
+            {
+                NetworkObjectReference reference = new(networkObject);
+                PickupItemServerRpc(reference, i);
+                return;
+            }
+            else Debug.LogError("Failed To Get Component [NetworkObject] from Item"); 
+        }
+        Debug.LogError("Your Hands are Full!");
+    }
+    [ServerRpc]
+    public void PickupItemServerRpc(NetworkObjectReference networkObjectReference, int slot, ServerRpcParams serverRpcParams = default){
+
+        networkObjectReference.TryGet(out NetworkObject networkObject);
+
+        Transform playerTransform = NetworkManager.Singleton.ConnectedClients[serverRpcParams.Receive.SenderClientId].PlayerObject.transform;
+        
+        GameObject spawnedObject = Instantiate(networkObject.gameObject, playerTransform.GetComponent<Inventory>().inventoryPositions[slot].position, quaternion.identity);
+
+        NetworkObject spawnedObjectNetworkObject = spawnedObject.GetComponent<NetworkObject>();
+
+        spawnedObjectNetworkObject.SpawnWithOwnership(serverRpcParams.Receive.SenderClientId);
+
+        spawnedObjectNetworkObject.TrySetParent(playerTransform);
+
+        playerTransform.GetComponent<Inventory>().inventorySlots[slot] = spawnedObject.transform;
+
+        networkObject.Despawn();
+
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    /*[Header("Slots")]
     public Transform[] _handTransforms;
     public NetworkObject[] _handItems;
     [Header("Variables")]
 
     public CinemachineVirtualCamera playerCamera;
     [SerializeField] private LayerMask layerMask;
-    public NetworkVariable<int> _selectedSlot = new(-1);
+    public NetworkVariable<int> selectedInventorySlot = new(-1);
 
     private void Update(){
         if (!IsOwner && IsLocalPlayer) return;
@@ -87,7 +195,6 @@ public class Inventory : NetworkBehaviour
         Rigidbody pickUpObjectRigidbody = networkObject.GetComponent<Rigidbody>();
         pickUpObjectRigidbody.isKinematic = true;
         pickUpObjectRigidbody.interpolation = RigidbodyInterpolation.None;
-
     }
     [ClientRpc]
     public void UpdateClientsOnItemChangeClientRpc(NetworkObjectReference playerReference, NetworkObjectReference objectReference, int slot){
@@ -147,4 +254,4 @@ public class Inventory : NetworkBehaviour
         inventory._handItems[_selectedSlot.Value] = null;
 
     }
-}
+*/}

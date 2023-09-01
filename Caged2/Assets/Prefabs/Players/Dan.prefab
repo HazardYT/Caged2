@@ -413,65 +413,6 @@ Transform:
   - {fileID: 8080517002098042839}
   m_Father: {fileID: 5460021931555390032}
   m_LocalEulerAnglesHint: {x: 7.8205748, y: 0.07322413, z: 1.9113576}
---- !u!1 &693067308165823371
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8062899383939101030}
-  - component: {fileID: 4371397218552087073}
-  m_Layer: 0
-  m_Name: ThirdHand
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &8062899383939101030
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 693067308165823371}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.002, y: -0.333, z: 0.25}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2903125185184853507}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1773428102 &4371397218552087073
-ParentConstraint:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 693067308165823371}
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Weight: 1
-  m_TranslationAtRest: {x: 0.002, y: -0.333, z: 0.25}
-  m_RotationAtRest: {x: 0, y: 0, z: 0}
-  m_TranslationOffsets:
-  - {x: 0.25455618, y: 0.17862463, z: 0.3092754}
-  m_RotationOffsets:
-  - {x: 9.837633, y: 93.423004, z: 130.11746}
-  m_AffectTranslationX: 1
-  m_AffectTranslationY: 1
-  m_AffectTranslationZ: 1
-  m_AffectRotationX: 1
-  m_AffectRotationY: 1
-  m_AffectRotationZ: 1
-  m_Active: 1
-  m_IsLocked: 0
-  m_Sources:
-  - sourceTransform: {fileID: 8080517002098042839}
-    weight: 1
 --- !u!1 &704061365620624300
 GameObject:
   m_ObjectHideFlags: 0
@@ -1005,18 +946,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 93c0ec31f1b935b49bcbb6c029e8fc69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _handTransforms:
+  allowTwoSlots: 0
+  inventorySlots:
+  - {fileID: 0}
+  - {fileID: 0}
+  inventoryPositions:
   - {fileID: 8423469555459342454}
   - {fileID: 4166467289943371816}
-  _handItems:
-  - {fileID: 0}
-  - {fileID: 0}
-  playerCamera: {fileID: 1877340958170974056}
-  layerMask:
-    serializedVersion: 2
-    m_Bits: 64
-  _selectedSlot:
-    m_InternalValue: 0
+  handTracking:
+  - {fileID: 268912621797226339}
+  - {fileID: 5115187412627002528}
 --- !u!114 &582419161742675384
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1146,6 +1085,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 5c2a2d60-e162-4b53-a611-8b2218ab0aa8
     m_ActionName: ActionMap/Interact[/Keyboard/e]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 531beaf0-262a-4c91-bdab-a5a7aa392237
+    m_ActionName: ActionMap/Drop[/Keyboard/g]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: ActionMap
@@ -3145,7 +3088,6 @@ Transform:
   m_Children:
   - {fileID: 8423469555459342454}
   - {fileID: 4166467289943371816}
-  - {fileID: 8062899383939101030}
   m_Father: {fileID: 279593053848219132}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5532980212006723302

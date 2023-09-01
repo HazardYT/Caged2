@@ -24,6 +24,7 @@ public class UserInput : NetworkBehaviour
     public bool LeftBumperPressed { get; private set; }
     public bool ThrowHeld { get; private set; }
     public bool ThrowReleased { get; private set; }
+    public bool DropPressed { get; private set; }
     public bool InteractPressed { get; private set; }
 
     public ControlScheme currentInputDevice = ControlScheme.KeyboardMouse;
@@ -39,6 +40,7 @@ public class UserInput : NetworkBehaviour
     private InputAction _leftBumperAction;
     private InputAction _throwAction;
     private InputAction _interactAction;
+    private InputAction _dropAction;
 
     public override void OnNetworkSpawn()
     {
@@ -65,6 +67,7 @@ public class UserInput : NetworkBehaviour
         _rightBumperAction = _playerInput.actions["RightBumper"];
         _leftBumperAction = _playerInput.actions["LeftBumper"];
         _throwAction = _playerInput.actions["Throw"];
+        _dropAction = _playerInput.actions["Drop"];
         _interactAction = _playerInput.actions["Interact"];
     }
     private void UpdateInputs()
@@ -79,6 +82,7 @@ public class UserInput : NetworkBehaviour
         Slot3Pressed = _slot3Action.WasPressedThisFrame();
         ThrowHeld = _throwAction.IsPressed();
         ThrowReleased = _throwAction.WasReleasedThisFrame();
+        DropPressed = _dropAction.WasPressedThisFrame();
         InteractPressed = _interactAction.WasPressedThisFrame();
         /*if( moveInput != Vector2.zero && _moveAction.activeControl.device is Keyboard){
             currentInputDevice = ControlScheme.KeyboardMouse;
