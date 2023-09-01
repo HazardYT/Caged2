@@ -20,10 +20,21 @@ public class Inventory : NetworkBehaviour
         for (int i = 0; i < inventorySlots.Length; i++)
         {
             if (inventorySlots[i] != null){
-                inventorySlots[i].position = handTracking[i].position;
-                inventorySlots[i].rotation = handTracking[i].rotation;
+                //if (IsServer){
+                    inventorySlots[i].SetPositionAndRotation(handTracking[i].position, handTracking[i].rotation);
+                //}
+                //else{
+                    //NetworkObjectReference networkObjectReference = new(inventorySlots[i].GetComponent<NetworkObject>());
+                  //  HandleTrackingClientRpc(networkObjectReference, handTracking[i].position, handTracking[i].rotation);
+                //}
             }
+            
         }
+    }
+    [ClientRpc]
+    public void HandleTrackingClientRpc(NetworkObjectReference reference, Vector3 position, Quaternion rotation){
+        reference.TryGet(out NetworkObject networkObject);
+        networkObject.transform.SetPositionAndRotation(position, rotation);
     }
     private void HandleInput()
     {
@@ -83,6 +94,8 @@ public class Inventory : NetworkBehaviour
         playerTransform.GetComponent<Inventory>().inventorySlots[slot] = spawnedObject.transform;
 
         networkObject.Despawn();
+
+
 
     }
     
