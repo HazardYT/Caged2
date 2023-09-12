@@ -14,7 +14,7 @@ public class Inventory : NetworkBehaviour
     public NetworkVariable<int> selectedSlot = new(0);
 
     private void Update(){
-        if (!IsOwner && IsLocalPlayer) return;
+        if (!IsOwner) return;
         HandleInput();
     }
     private void HandleInput()
@@ -166,8 +166,11 @@ public class Inventory : NetworkBehaviour
 
         inventory.inventorySlots[inventory.selectedSlot.Value] = null;
 
-        networkObject.GetComponent<ParentConstraint>().RemoveSource(0);
-
+        ParentConstraint parentConstraint = networkObject.GetComponent<ParentConstraint>();
+        if (parentConstraint.sourceCount != 0){
+            parentConstraint.RemoveSource(0);
+        }
+        
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.isKinematic = false;
     }
