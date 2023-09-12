@@ -2799,8 +2799,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 916030221}
-  - component: {fileID: 916030220}
   - component: {fileID: 916030219}
+  - component: {fileID: 916030220}
   - component: {fileID: 916030222}
   m_Layer: 0
   m_Name: GameManager
@@ -2823,7 +2823,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 4167821223
   AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
+  SynchronizeTransform: 0
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 1
   SpawnWithObservers: 1

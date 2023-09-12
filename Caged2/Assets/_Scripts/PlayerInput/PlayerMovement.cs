@@ -14,6 +14,7 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] private float _controllerSensY;
     [SerializeField] private CharacterController controller;
     [SerializeField] private Animator anim;
+    bool spawnLocked = true;
     public Transform playerCam;
     public float stamina = 100f;
     private float StaminaRegenTimer = 0.0f;
@@ -49,7 +50,7 @@ public class PlayerMovement : NetworkBehaviour
         cvm.Priority = 1;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-
+        spawnLocked = false;
     }
     public void Update()
     {
@@ -83,12 +84,12 @@ public class PlayerMovement : NetworkBehaviour
         bool isCrouched = UserInput.instance.CrouchHeld && !UserInput.instance.SprintHeld;
         float speed = isRunning ? _runSpeed : _walkSpeed;
         Vector3 movement = move.y * transform.forward + move.x * transform.right;
-        if (!controller.isGrounded){
+        if (!controller.isGrounded && !spawnLocked){
             verticalVelocity -= gravity * Time.deltaTime;
         }
         else verticalVelocity = 0f;
         movement.y = verticalVelocity;
-        controller.Move(movement * speed * Time.deltaTime);
+        controller.Move(speed * Time.deltaTime * movement);
         Stamina(isRunning);
         HandleAnimationParams(move, isCrouched, isRunning);
     }

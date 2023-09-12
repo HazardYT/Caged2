@@ -37,8 +37,9 @@ public class ItemSpawner : NetworkBehaviour
     public List<Transform> ValueablesSpawnPoints = new();
 
 
-    public override void OnNetworkSpawn(){
+    public IEnumerator Start(){
         if (IsServer){
+            yield return new WaitForSeconds(10f);
             StartCoroutine(SpawnItem(JailKeyPrefab, JailKeySpawnPoints, 3));
             StartCoroutine(SpawnItem(BasementKeyPrefab, BasementKeySpawnPoints, 3));
             StartCoroutine(SpawnItem(BatteryPrefab, BatterySpawnPoints, 3));
