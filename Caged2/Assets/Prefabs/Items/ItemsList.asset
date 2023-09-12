@@ -10,18 +10,30 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e651dbb3fbac04af2b8f5abf007ddc23, type: 3}
-  m_Name: Players
+  m_Name: ItemsList
   m_EditorClassIdentifier: 
   IsDefault: 0
   List:
   - Override: 0
-    Prefab: {fileID: 1042664207231814172, guid: 3322e1a1ff372034ab3b84cd204379f5,
+    Prefab: {fileID: 7561166860732003305, guid: c8bf1effadb200b45a11e601ec781063,
       type: 3}
     SourcePrefabToOverride: {fileID: 0}
     SourceHashToOverride: 0
     OverridingTargetPrefab: {fileID: 0}
   - Override: 0
-    Prefab: {fileID: 9050870023235631346, guid: 39f92b9ddb834b44a81dd5a5258f0c59,
+    Prefab: {fileID: 3424804539275935598, guid: 6e1b64de10865c9448450343c267ff69,
+      type: 3}
+    SourcePrefabToOverride: {fileID: 0}
+    SourceHashToOverride: 0
+    OverridingTargetPrefab: {fileID: 0}
+  - Override: 0
+    Prefab: {fileID: 6846439862546005772, guid: 53eefa4e4725d3c42823d09198136710,
+      type: 3}
+    SourcePrefabToOverride: {fileID: 0}
+    SourceHashToOverride: 0
+    OverridingTargetPrefab: {fileID: 0}
+  - Override: 0
+    Prefab: {fileID: 6654187963196106328, guid: 9e0954d2dac8f4f4cb5cb9a45628ed34,
       type: 3}
     SourcePrefabToOverride: {fileID: 0}
     SourceHashToOverride: 0
