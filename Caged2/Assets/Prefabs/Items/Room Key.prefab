@@ -108,14 +108,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 64166d27941a54e4196396e3818eb564,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2026068638630909818}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 64166d27941a54e4196396e3818eb564,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8183963281654441610}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 64166d27941a54e4196396e3818eb564,
-        type: 3}
-      insertIndex: -1
       addedObject: {fileID: 7925701488224336128}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 64166d27941a54e4196396e3818eb564,
         type: 3}
@@ -129,6 +121,14 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 3114826918472011250}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 64166d27941a54e4196396e3818eb564,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -5720924825849433332}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 64166d27941a54e4196396e3818eb564,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6267358160613643675}
   m_SourcePrefab: {fileID: 100100000, guid: 64166d27941a54e4196396e3818eb564, type: 3}
 --- !u!1 &6654187963196106328 stripped
 GameObject:
@@ -183,48 +183,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
---- !u!114 &2026068638630909818
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6654187963196106328}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SyncPositionX: 1
-  SyncPositionY: 1
-  SyncPositionZ: 1
-  SyncRotAngleX: 1
-  SyncRotAngleY: 1
-  SyncRotAngleZ: 1
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  UseQuaternionSynchronization: 0
-  UseQuaternionCompression: 0
-  UseHalfFloatPrecision: 0
-  InLocalSpace: 0
-  Interpolate: 1
-  SlerpPosition: 0
---- !u!114 &8183963281654441610
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6654187963196106328}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!65 &7925701488224336128
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -298,3 +256,45 @@ MonoBehaviour:
   sprite: {fileID: 21300000, guid: 20dd0bc627a2c5348b342f6c4ad9aa23, type: 3}
   audioSource: {fileID: 0}
   audioClips: []
+--- !u!114 &-5720924825849433332
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6654187963196106328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2b8072ff50726f54db065e9591e5eebe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncPositionX: 1
+  SyncPositionY: 1
+  SyncPositionZ: 1
+  SyncRotAngleX: 1
+  SyncRotAngleY: 1
+  SyncRotAngleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
+  PositionThreshold: 0.001
+  RotAngleThreshold: 0.01
+  ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
+  InLocalSpace: 0
+  Interpolate: 1
+  SlerpPosition: 0
+--- !u!114 &6267358160613643675
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6654187963196106328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f6c0be61502bb534f922ebb746851216, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

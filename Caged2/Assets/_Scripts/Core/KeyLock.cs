@@ -33,7 +33,7 @@ public class KeyLock : NetworkBehaviour, IInteractable
         }
 
     }
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     public void UnlockKeyLockServerRpc(NetworkObjectReference objectReference){
         if (!objectReference.TryGet(out NetworkObject networkObject)) { Debug.LogError("NO NETWORK OBJECT REF FOUND ON KEYLOCK"); return; }
         networkObject.GetComponent<KeyLock>().IsLocked.Value = false;
