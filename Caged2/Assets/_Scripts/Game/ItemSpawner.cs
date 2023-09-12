@@ -38,11 +38,12 @@ public class ItemSpawner : NetworkBehaviour
 
 
     public IEnumerator Start(){
-        if (IsServer){
+        if (IsHost){
             yield return new WaitForSeconds(10f);
-            StartCoroutine(SpawnItem(JailKeyPrefab, JailKeySpawnPoints, 3));
-            StartCoroutine(SpawnItem(BasementKeyPrefab, BasementKeySpawnPoints, 3));
-            StartCoroutine(SpawnItem(BatteryPrefab, BatterySpawnPoints, 3));
+            StartCoroutine(SpawnItem(JailKeyPrefab, JailKeySpawnPoints, 1));
+            //StartCoroutine(SpawnItem(JailKeyPrefab, JailKeySpawnPoints, 3));
+            //StartCoroutine(SpawnItem(BasementKeyPrefab, BasementKeySpawnPoints, 3));
+            //StartCoroutine(SpawnItem(BatteryPrefab, BatterySpawnPoints, 3));
         }
     }
 
@@ -53,7 +54,7 @@ public class ItemSpawner : NetworkBehaviour
             GameObject spawnObject = Instantiate(obj, spawnpoints[r].position, spawnpoints[r].rotation);
             spawnObject.GetComponent<NetworkObject>().Spawn();
             spawnObject.name = obj.name;
-            yield return new WaitForEndOfFrame();            
+            yield return new WaitForEndOfFrame();             
         }
     }
 }

@@ -54,8 +54,7 @@ public class PlayerMovement : NetworkBehaviour
     }
     public void Update()
     {
-        if (!IsOwner) return;
-        if (movementLocked.Value) { return; }
+        if (!IsOwner || movementLocked.Value) return;
         Look();
         Move();
     }
