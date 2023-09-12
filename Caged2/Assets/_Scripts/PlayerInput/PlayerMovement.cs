@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : NetworkBehaviour
 {
     [Header("Variables")]
+    public NetworkVariable<bool> movementLocked = new();
     [SerializeField] private float _walkSpeed;
     [SerializeField] private float _runSpeed;
     [SerializeField] private float _mouseSensX;
@@ -13,7 +14,6 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] private float _controllerSensY;
     [SerializeField] private CharacterController controller;
     [SerializeField] private Animator anim;
-    private CapsuleCollider capsuleCollider;
     public Transform playerCam;
     public float stamina = 100f;
     private float StaminaRegenTimer = 0.0f;
@@ -24,7 +24,6 @@ public class PlayerMovement : NetworkBehaviour
     float xRotation;
     float verticalVelocity = 0;
     private float gravity = 9.61f;
-    [SerializeField] private GameObject item;
     public const string IDLE = "Idle";
     public const string WALK_FORWARD = "Walk Forward";
     public const string WALK_BACKWARD = "Walk Backward";
@@ -50,20 +49,14 @@ public class PlayerMovement : NetworkBehaviour
         cvm.Priority = 1;
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        capsuleCollider = GetComponent<CapsuleCollider>();
 
     }
     public void Update()
     {
         if (!IsOwner) return;
-        Vector2 lookInput = UserInput.instance.lookInput;
-        Vector2 movementInput = UserInput.instance.moveInput;
+        if (movementLocked.Value) { return; }
         Look();
         Move();
-        if (UserInput.instance.Slot3Pressed){
-            GameObject i = Instantiate(item, Vector3.zero, Quaternion.identity);
-            i.GetComponent<NetworkObject>().Spawn();
-        }
     }
     public void Look()
     {
