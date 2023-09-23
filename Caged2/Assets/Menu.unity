@@ -2463,7 +2463,7 @@ MonoBehaviour:
     m_PressedTrigger: Pressed
     m_SelectedTrigger: Selected
     m_DisabledTrigger: Disabled
-  m_Interactable: 1
+  m_Interactable: 0
   m_TargetGraphic: {fileID: 1805681034}
   m_OnClick:
     m_PersistentCalls:
@@ -3132,7 +3132,7 @@ PrefabInstance:
     - target: {fileID: 1034226041196623279, guid: 3756ee70d9d5591479b05fa55e013977,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 120
+      value: 144
       objectReference: {fileID: 0}
     - target: {fileID: 1337733590021579752, guid: 3756ee70d9d5591479b05fa55e013977,
         type: 3}
@@ -3219,6 +3219,11 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2566983224378325305, guid: 3756ee70d9d5591479b05fa55e013977,
+        type: 3}
+      propertyPath: startButton
+      value: 
+      objectReference: {fileID: 1805681033}
     - target: {fileID: 2824343935685034733, guid: 3756ee70d9d5591479b05fa55e013977,
         type: 3}
       propertyPath: m_AnchorMax.y

@@ -5,24 +5,28 @@ public struct CharacterSelectState : INetworkSerializable, IEquatable<CharacterS
 {
     public ulong ClientId;
     public int CharacterId;
-    public FixedString32Bytes name;
+    public bool IsLockedIn;
+    public FixedString32Bytes Name;
 
-    public CharacterSelectState(ulong clientId, FixedString32Bytes steamName = default, int characterId = -1)
+    public CharacterSelectState(ulong clientId, FixedString32Bytes steamName, int characterId = -1, bool isLockedIn = false)
     {
-        name = steamName;
+        Name = steamName;
         ClientId = clientId;
         CharacterId = characterId;
+        IsLockedIn = isLockedIn;
     }
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
-        serializer.SerializeValue(ref name);
+        serializer.SerializeValue(ref Name);
         serializer.SerializeValue(ref ClientId);
         serializer.SerializeValue(ref CharacterId);
+        serializer.SerializeValue(ref IsLockedIn);
     }
     public bool Equals(CharacterSelectState other)
     {
         return ClientId == other.ClientId &&
             CharacterId == other.CharacterId && 
-            name == other.name;
+            Name == other.Name &&
+            IsLockedIn == other.IsLockedIn;
     }
 }

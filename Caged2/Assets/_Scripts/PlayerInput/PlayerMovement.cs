@@ -1,7 +1,6 @@
 using Unity.Netcode;
 using UnityEngine;
 using Cinemachine;
-using UnityEngine.InputSystem;
 public class PlayerMovement : NetworkBehaviour
 {
     [Header("Variables")]
@@ -80,7 +79,7 @@ public class PlayerMovement : NetworkBehaviour
     {   
         Vector2 move = UserInput.instance.moveInput;
         bool isRunning = UserInput.instance.SprintHeld && controller.velocity.magnitude > 0 && !UserInput.instance.CrouchHeld;
-        bool isCrouched = UserInput.instance.CrouchHeld && !UserInput.instance.SprintHeld;
+        bool isCrouched = UserInput.instance.CrouchHeld && !isRunning;
         float speed = isRunning ? _runSpeed : _walkSpeed;
         Vector3 movement = move.y * transform.forward + move.x * transform.right;
         if (!controller.isGrounded && !spawnLocked){
