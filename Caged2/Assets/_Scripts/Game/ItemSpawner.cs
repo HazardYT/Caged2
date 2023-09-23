@@ -18,6 +18,7 @@ public class ItemSpawner : NetworkBehaviour
     public GameObject CandlePrefab;
     public GameObject DollPrefab;
     public GameObject BatteryPrefab;
+    private NetworkObject _itemParent;
 
     [Header("Spawn Points")]
     public List<Transform> JailKeySpawnPoints = new();
@@ -38,6 +39,7 @@ public class ItemSpawner : NetworkBehaviour
 
 
     public override void OnNetworkSpawn(){
+        _itemParent = this.GetComponent<NetworkObject>();
         if (IsHost){
             StartCoroutine(SpawnItem(JailKeyPrefab, JailKeySpawnPoints, 3));
             StartCoroutine(SpawnItem(BasementKeyPrefab, BasementKeySpawnPoints, 3));
@@ -50,9 +52,11 @@ public class ItemSpawner : NetworkBehaviour
         {
             int r = Random.Range(0, spawnpoints.Count);
             GameObject spawnObject = Instantiate(obj, spawnpoints[r].position, spawnpoints[r].rotation);
-            spawnObject.GetComponent<NetworkObject>().Spawn();
+            NetworkObject networkObject = spawnObject.GetComponent<NetworkObject>();
+            networkObject.Spawn();
+            networkObject.TrySetParent(_itemParent);
             spawnObject.name = obj.name;
-            yield return new WaitForEndOfFrame();             
+            yield return new WaitForEndOfFrame();            
         }
     }
 }

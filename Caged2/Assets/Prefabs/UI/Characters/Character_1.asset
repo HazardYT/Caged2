@@ -15,4 +15,5 @@ MonoBehaviour:
   id: 0
   displayName: NEGRO
   icon: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  prefab: {fileID: 1007890603528503231, guid: 3322e1a1ff372034ab3b84cd204379f5, type: 3}
+  gameplayPrefab: {fileID: 1007890603528503231, guid: 3322e1a1ff372034ab3b84cd204379f5,
+    type: 3}

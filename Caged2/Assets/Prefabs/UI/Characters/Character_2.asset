@@ -15,4 +15,5 @@ MonoBehaviour:
   id: 1
   displayName: CHINK
   icon: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
-  prefab: {fileID: 3800813666662993288, guid: 39f92b9ddb834b44a81dd5a5258f0c59, type: 3}
+  gameplayPrefab: {fileID: 3800813666662993288, guid: 39f92b9ddb834b44a81dd5a5258f0c59,
+    type: 3}

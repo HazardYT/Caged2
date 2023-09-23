@@ -56,6 +56,7 @@ public class ServerManager : MonoBehaviour
     public void SetCharacter(ulong clientId, int characterId){
         if (ClientData.TryGetValue(clientId, out ClientData data)){
             data.characterId = characterId;
+            print(data.characterId);
         }
     }
     public void StartGame(){
